@@ -199,8 +199,7 @@ const OtpVerification = () => {
         <div className="flex-1" />
         <div className="flex flex-col items-center pb-8 mt-8">
           <img src={nedLogo} alt="NED University" className="w-32 h-32 object-contain mb-2" />
-          <p className="text-xs text-muted-foreground">In collaboration with</p>
-          <p className="text-sm font-semibold text-foreground">NED University</p>
+          <p className="text-xs text-muted-foreground">Developed by Zainab Asim | NEDUET</p>
         </div>
       </div>
     </div>

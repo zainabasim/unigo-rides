@@ -150,7 +150,7 @@ const Home = () => {
       {/* Footer */}
       <div className="flex flex-col items-center py-4 border-t border-border">
         <img src={nedLogo} alt="NED University" className="w-12 h-12 object-contain mb-1" />
-        <p className="text-xs text-muted-foreground">NED University Faculty Carpool</p>
+        <p className="text-xs text-muted-foreground">Developed by Zainab Asim | NEDUET</p>
       </div>
     </div>
   );
