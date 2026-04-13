@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Car, Search, MapPin, Clock, Users } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
+import PhoneContact from "@/components/PhoneContact";
 
 interface SearchingRidesProps {
   pickupLocation?: string;
@@ -25,7 +26,7 @@ const SearchingRides = ({ pickupLocation = "Your Location", destination = "NED U
     queryFn: async () => {
       const { data, error } = await supabase
         .from("rides")
-        .select("*, profiles!rides_driver_id_fkey(full_name, department)")
+        .select("*, profiles!rides_driver_id_fkey(full_name, department, phone_number)")
         .eq("is_active", true)
         .gt("available_seats", 0)
         .order("created_at", { ascending: false });
@@ -136,9 +137,10 @@ const SearchingRides = ({ pickupLocation = "Your Location", destination = "NED U
 
           <div className="space-y-4">
             {matchedRides.map((ride) => {
-              const profile = ride.profiles as unknown as { full_name: string; department: string } | null;
+              const profile = ride.profiles as unknown as { full_name: string; department: string; phone_number?: string } | null;
               const driverName = profile?.full_name || "Faculty Member";
               const department = profile?.department || "Department";
+              const phoneNumber = profile?.phone_number;
               const initial = driverName.charAt(0).toUpperCase();
 
               return (
@@ -162,6 +164,16 @@ const SearchingRides = ({ pickupLocation = "Your Location", destination = "NED U
                     <p className="text-muted-foreground">Time: <span className="text-card-foreground">{ride.departure_time}</span></p>
                     <p className="text-muted-foreground">Car: <span className="text-card-foreground">{ride.vehicle_model}</span></p>
                   </div>
+
+                  {phoneNumber && (
+                    <div className="mb-3">
+                      <PhoneContact 
+                        phoneNumber={phoneNumber} 
+                        userName={driverName}
+                        compact={true}
+                      />
+                    </div>
+                  )}
 
                   <button
                     onClick={() => handleBookRide(ride.id)}

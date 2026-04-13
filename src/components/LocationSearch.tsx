@@ -258,7 +258,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border-2 border-primary/20 bg-black/95 backdrop-blur-sm shadow-2xl shadow-primary/20 max-h-64 overflow-y-auto">
+        <div className="absolute z-[9999] mt-1 w-full rounded-xl border-2 border-primary/20 bg-black/95 backdrop-blur-sm shadow-2xl shadow-primary/20 max-h-64 overflow-y-auto">
           {loading ? (
             <div className="p-4 text-sm text-primary text-center animate-pulse">
               <div className="flex items-center justify-center gap-2">

@@ -2,6 +2,15 @@
 
 This document outlines the required database schema changes to support the new UniGo features.
 
+## Existing Tables to Update
+
+### 1. `profiles` Table
+Add phone number support:
+
+```sql
+ALTER TABLE profiles ADD COLUMN phone_number TEXT;
+```
+
 ## New Tables to Add
 
 ### 1. `ride_messages` Table

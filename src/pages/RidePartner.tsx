@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Car, Clock, MapPin, User, XCircle } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
+import PhoneContact from "@/components/PhoneContact";
 
 const RidePartner = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const RidePartner = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, rides(*, profiles!rides_driver_id_fkey(full_name, department))")
+        .select("*, rides(*, profiles!rides_driver_id_fkey(full_name, department, phone_number))")
         .eq("id", bookingId!)
         .single();
       if (error) throw error;
@@ -62,7 +63,7 @@ const RidePartner = () => {
   }
 
   const ride = booking.rides as any;
-  const driver = ride?.profiles as { full_name: string; department: string } | null;
+  const driver = ride?.profiles as { full_name: string; department: string; phone_number?: string } | null;
   const rideStatus = ride?.ride_status || "awaiting";
   const isCancelled = booking.status === "cancelled";
 
@@ -119,6 +120,13 @@ const RidePartner = () => {
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">{ride?.plate_number}</span>
             </div>
+            {driver?.phone_number && (
+              <PhoneContact 
+                phoneNumber={driver.phone_number} 
+                userName={driver.full_name}
+                compact={true}
+              />
+            )}
           </div>
         </div>
 
