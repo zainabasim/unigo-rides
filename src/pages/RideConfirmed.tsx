@@ -86,6 +86,16 @@ const RideConfirmed = () => {
     }
   };
 
+  const handleWhatsApp = (phone: string) => {
+    const cleanPhone = phone.replace(/\D/g, "");
+    const whatsappUrl = `https://wa.me/${cleanPhone}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleCall = (phone: string) => {
+    window.location.href = `tel:${phone}`;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -193,10 +203,20 @@ const RideConfirmed = () => {
                 <p className="text-sm text-muted-foreground">{driver?.department || "Department"}</p>
               </div>
               <div className="flex gap-2">
-                <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
-                  <Phone className="w-4 h-4 text-foreground" />
-                </button>
-                <button className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors">
+                {driver?.phone && (
+                  <button 
+                    onClick={() => handleCall(driver.phone)}
+                    className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                    title="Call driver"
+                  >
+                    <Phone className="w-4 h-4 text-foreground" />
+                  </button>
+                )}
+                <button 
+                  onClick={() => handleWhatsApp(driver?.phone)}
+                  className="p-2 rounded-lg bg-green-100 hover:bg-green-200 transition-colors"
+                  title="WhatsApp driver"
+                >
                   <MessageCircle className="w-4 h-4 text-foreground" />
                 </button>
               </div>
