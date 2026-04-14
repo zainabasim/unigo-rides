@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANONYMOUS_KEY;
+
 const Register = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<1 | 2>(1);
@@ -20,6 +23,7 @@ const Register = () => {
   // OTP
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [devOtp, setDevOtp] = useState<string | null>(null); // For development only
 
   // Validate email domain
   const validateEmail = (email: string) => {
@@ -32,12 +36,7 @@ const Register = () => {
     return regex.test(phone.replace(/-/g, ""));
   };
 
-  // Generate 5-digit OTP
-  const generateOTP = () => {
-    return Math.floor(10000 + Math.random() * 90000).toString();
-  };
-
-  // Handle registration step 1
+  // Handle registration step 1 - Call Edge Function
   const handleGetOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -54,40 +53,36 @@ const Register = () => {
     setLoading(true);
     
     try {
-      // Check if email already exists in auth
-      const { data: existingUsers } = await supabase
-        .from("profiles")
-        .select("id")
-        .limit(1);
-
-      // Try to check if user exists via auth API
-      const { data: signInData } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: "dummy-check-only",
+      // Call Edge Function to send OTP
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          email,
+          fullName,
+          phone: phone.replace(/-/g, ""),
+          department,
+          password,
+        }),
       });
 
-      if (signInData.user) {
-        toast.error("This email is already registered. Please login instead.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Failed to send OTP");
         setLoading(false);
         return;
       }
 
-      // Generate and store OTP in localStorage for demo (in production, use backend)
-      const generatedOtp = generateOTP();
-      localStorage.setItem("registration_otp", generatedOtp);
-      localStorage.setItem("registration_email", email);
-      localStorage.setItem("registration_data", JSON.stringify({
-        fullName,
-        email,
-        phone: phone.replace(/-/g, ""),
-        password,
-        department
-      }));
-
-      // Simulate sending email (console.log for now)
-      console.log(`OTP for ${email}: ${generatedOtp}`);
+      // For development: show OTP if returned
+      if (data.devOtp) {
+        setDevOtp(data.devOtp);
+        console.log(`Development OTP: ${data.devOtp}`);
+      }
       
-      // Show success
       toast.success("Verification code sent! Check your email.");
       setStep(2);
     } catch (error) {
@@ -118,7 +113,7 @@ const Register = () => {
     }
   };
 
-  // Verify OTP and complete registration
+  // Verify OTP via Edge Function and complete registration
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -131,42 +126,28 @@ const Register = () => {
     setLoading(true);
     
     try {
-      const storedOtp = localStorage.getItem("registration_otp");
-      const storedEmail = localStorage.getItem("registration_email");
-      const storedData = localStorage.getItem("registration_data");
-
-      if (storedOtp !== enteredOtp || storedEmail !== email) {
-        toast.error("Invalid verification code");
-        setLoading(false);
-        return;
-      }
-
-      const regData = JSON.parse(storedData || "{}");
-
-      // Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: regData.email,
-        password: regData.password,
-        options: {
-          data: {
-            full_name: regData.fullName,
-            department: regData.department,
-            phone_number: regData.phone,
-          },
+      // Call Edge Function to verify OTP
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
         },
+        body: JSON.stringify({
+          email,
+          otp: enteredOtp,
+        }),
       });
 
-      if (authError) {
-        toast.error(authError.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Verification failed");
         setLoading(false);
         return;
       }
 
-      // Clear stored data
-      localStorage.removeItem("registration_otp");
-      localStorage.removeItem("registration_email");
-      localStorage.removeItem("registration_data");
-
+      setDevOtp(null);
       toast.success("Registration successful! Please login.");
       navigate("/");
     } catch (error) {
@@ -332,8 +313,16 @@ const Register = () => {
               Back to registration
             </button>
 
+            {devOtp && (
+              <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                <p className="text-xs text-yellow-800 dark:text-yellow-200 text-center">
+                  Development Mode:<br/>
+                  OTP: <strong>{devOtp}</strong>
+                </p>
+              </div>
+            )}
             <p className="text-center text-xs text-muted-foreground mt-4">
-              Demo: Check browser console for OTP
+              Check your email for the 5-digit code
             </p>
           </form>
         )}
