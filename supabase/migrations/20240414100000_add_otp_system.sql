@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS registration_otps (
   otp TEXT NOT NULL,
   full_name TEXT NOT NULL,
   phone TEXT NOT NULL,
-  department TEXT NOT NULL,
   password_hash TEXT NOT NULL, -- Temporary storage, deleted after verification
   created_at TIMESTAMPTZ DEFAULT now(),
   expires_at TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '5 minutes'),

@@ -22,7 +22,6 @@ interface RequestBody {
   email: string;
   fullName: string;
   phone: string;
-  department?: string;
   password: string;
 }
 
@@ -169,9 +168,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, fullName, phone, department, password }: RequestBody = await req.json();
-    
-    // Department is optional now
+    const { email, fullName, phone, password }: RequestBody = await req.json();
 
     // Validate email domain
     if (!email.endsWith("@cloud.neduet.edu.pk") && !email.endsWith("@neduet.edu.pk")) {
@@ -215,7 +212,6 @@ serve(async (req) => {
         otp,
         full_name: fullName,
         phone,
-        department: department || null,
         password_hash: passwordHash,
         expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes
         verified: false,
