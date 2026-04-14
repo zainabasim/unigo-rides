@@ -5,4 +5,4 @@ cmds = ["npm install --legacy-peer-deps", "npm run build"]
 nixPkgs = ["nodejs_20"]
 
 [start]
-cmd = "npm start"
+cmd = "npx vite preview --port ${PORT:-8080} --host --mode production"

@@ -11,8 +11,8 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview --port ${PORT:-8080} --host",
-    "start": "vite preview --port ${PORT:-8080} --host",
+    "preview": "vite preview --port ${PORT:-8080} --host --mode production",
+    "start": "vite preview --port ${PORT:-8080} --host --mode production",
     "test": "vitest run",
     "test:watch": "vitest"
   },
