@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +18,7 @@ const NeedARide = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [areaFilter, setAreaFilter] = useState("All Areas");
+  const [isFilterPending, startFilterTransition] = useTransition();
   const [bookedRides, setBookedRides] = useState<Set<string>>(new Set());
   const [searchLocation, setSearchLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedLandmark, setSelectedLandmark] = useState<any>(null);
@@ -171,7 +172,13 @@ const NeedARide = () => {
         <div className="relative">
           <select
             value={areaFilter}
-            onChange={(e) => setAreaFilter(e.target.value)}
+            onChange={(e) => {
+              // Use startTransition to prevent UI blocking during data fetch
+              startFilterTransition(() => {
+                setAreaFilter(e.target.value);
+              });
+            }}
+            disabled={isFilterPending}
             className="w-full h-12 rounded-xl border border-border bg-background px-4 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
           >
             {areas.map((area) => (
