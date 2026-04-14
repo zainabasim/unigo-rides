@@ -22,7 +22,7 @@ interface RequestBody {
   email: string;
   fullName: string;
   phone: string;
-  department: string;
+  department?: string;
   password: string;
 }
 
@@ -170,6 +170,8 @@ serve(async (req) => {
 
   try {
     const { email, fullName, phone, department, password }: RequestBody = await req.json();
+    
+    // Department is optional now
 
     // Validate email domain
     if (!email.endsWith("@cloud.neduet.edu.pk") && !email.endsWith("@neduet.edu.pk")) {
@@ -213,7 +215,7 @@ serve(async (req) => {
         otp,
         full_name: fullName,
         phone,
-        department,
+        department: department || null,
         password_hash: passwordHash,
         expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5 minutes
         verified: false,
@@ -228,8 +230,8 @@ serve(async (req) => {
       );
     }
 
-    // Send email
-    const emailSent = await sendEmail(email, otp, fullName);
+    // Send email (use email for full name if not provided)
+    const emailSent = await sendEmail(email, otp, fullName || email.split('@')[0]);
 
     if (!emailSent) {
       return new Response(

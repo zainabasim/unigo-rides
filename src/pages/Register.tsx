@@ -18,7 +18,6 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [department, setDepartment] = useState("");
   
   // OTP
   const [otp, setOtp] = useState(["", "", "", "", ""]);
@@ -64,7 +63,6 @@ const Register = () => {
           email,
           fullName,
           phone: phone.replace(/-/g, ""),
-          department,
           password,
         }),
       });
@@ -219,28 +217,6 @@ const Register = () => {
               <p className="text-xs text-muted-foreground mt-1 ml-1">
                 Pakistan format: 03xxxxxxxxx
               </p>
-            </div>
-
-            <div>
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full p-4 border border-border rounded-xl bg-background text-foreground focus:border-[#00D154] focus:outline-none"
-                required
-              >
-                <option value="">Select Department</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                <option value="Civil Engineering">Civil Engineering</option>
-                <option value="Chemical Engineering">Chemical Engineering</option>
-                <option value="Industrial Engineering">Industrial Engineering</option>
-                <option value="Architecture">Architecture</option>
-                <option value="Mathematics">Mathematics</option>
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Humanities">Humanities</option>
-              </select>
             </div>
 
             <div>

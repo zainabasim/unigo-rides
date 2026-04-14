@@ -89,7 +89,7 @@ serve(async (req) => {
       email_confirm: true,
       user_metadata: {
         full_name: otpData.full_name,
-        department: otpData.department,
+        department: otpData.department || null,
         phone_number: otpData.phone,
       },
     });
