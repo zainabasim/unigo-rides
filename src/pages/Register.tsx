@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useTransition } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   
   // Form data
   const [fullName, setFullName] = useState("");
@@ -49,7 +50,10 @@ const Register = () => {
       return;
     }
 
-    setLoading(true);
+    // Use startTransition to prevent UI blocking
+    startTransition(() => {
+      setLoading(true);
+    });
     
     try {
       // Call Edge Function to send OTP
@@ -121,7 +125,10 @@ const Register = () => {
       return;
     }
 
-    setLoading(true);
+    // Use startTransition to prevent UI blocking
+    startTransition(() => {
+      setLoading(true);
+    });
     
     try {
       // Call Edge Function to verify OTP
@@ -233,8 +240,8 @@ const Register = () => {
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-[#00D154] text-white py-4 rounded-xl font-bold hover:bg-[#00D154]/90 transition-colors disabled:opacity-50"
+              disabled={loading || isPending}
+              className="w-full bg-[#00D154] text-black font-bold py-4 rounded-xl hover:bg-[#00D154]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Sending..." : "Get Verification Code"}
             </button>
