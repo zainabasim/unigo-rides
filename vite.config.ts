@@ -3,8 +3,8 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(({ mode }) => ({
-  // GitHub Pages deployment - use repository name as base path
-  base: mode === 'production' ? '/unigo-rides-main/' : '/',
+  // Vercel deployment - use root path
+  base: '/',
   plugins: [react()],
   resolve: {
     alias: {
