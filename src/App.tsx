@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import OtpVerification from "./pages/OtpVerification";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import NeedARide from "./pages/NeedARide";
@@ -34,7 +33,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/verify-otp" element={<OtpVerification />} />
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/need-a-ride" element={<ProtectedRoute><NeedARide /></ProtectedRoute>} />

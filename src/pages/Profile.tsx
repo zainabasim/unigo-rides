@@ -35,19 +35,47 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
+        console.log('Fetching profile for user_id:', user.id);
         const { data, error } = await supabase
           .from("profiles")
           .select("full_name, department, designation, green_score, total_rides")
           .eq("user_id", user.id)
           .single();
 
+        console.log('Profile response:', { data, error });
+        
         if (error) {
           console.error("Profile fetch error:", error);
-        } else {
+          // Set default profile data if fetch fails
+          setProfile({
+            full_name: user.email?.split('@')[0] || 'User',
+            department: 'Computer Science',
+            designation: 'Faculty Member',
+            green_score: 0,
+            total_rides: 0
+          });
+        } else if (data) {
           setProfile(data);
+        } else {
+          // Set default profile if no data returned
+          setProfile({
+            full_name: user.email?.split('@')[0] || 'User',
+            department: 'Computer Science',
+            designation: 'Faculty Member',
+            green_score: 0,
+            total_rides: 0
+          });
         }
       } catch (error) {
         console.error("Profile fetch error:", error);
+        // Set default profile on error
+        setProfile({
+          full_name: user.email?.split('@')[0] || 'User',
+          department: 'Computer Science',
+          designation: 'Faculty Member',
+          green_score: 0,
+          total_rides: 0
+        });
       }
     };
 

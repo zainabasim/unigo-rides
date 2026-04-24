@@ -20,15 +20,14 @@ export const useAuth = () => useContext(AuthContext);
 
 const ensureProfile = async (user: User) => {
   const fullName = typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "";
-  const department = typeof user.user_metadata?.department === "string" ? user.user_metadata.department : "";
+  const phone = typeof user.user_metadata?.phone === "string" ? user.user_metadata.phone : "";
 
-  if (!fullName && !department) return;
+  if (!fullName && !phone) return;
 
   await supabase.from("profiles").upsert(
     {
       user_id: user.id,
       full_name: fullName,
-      department,
     },
     { onConflict: "user_id" }
   );

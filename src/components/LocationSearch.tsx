@@ -109,12 +109,19 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
       // Then search OpenStreetMap for more specific addresses
       let apiResults: LocationResult[] = [];
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ", Karachi, Pakistan")}&limit=3`
-        );
+        const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ", Karachi, Pakistan")}&limit=3`;
+        console.log('Fetching from OpenStreetMap API:', apiUrl);
+        
+        const res = await fetch(apiUrl);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
         apiResults = await res.json();
       } catch (error) {
-        console.log("API search failed, using local database only");
+        console.error('OpenStreetMap API error:', error);
+        console.log('API search failed, using local database only');
       }
       
       // Combine results, prioritizing Karachi areas
@@ -200,9 +207,15 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
         const { latitude, longitude } = position.coords;
         
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
+          const reverseUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+          console.log('Fetching reverse geocoding from:', reverseUrl);
+          
+          const res = await fetch(reverseUrl);
+          
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          
           const data = await res.json();
           
           const locationName = data.display_name?.split(",").slice(0, 3).join(", ") || "Current Location";
@@ -210,6 +223,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
           onSelect({ name: locationName, lat: latitude, lng: longitude });
           setIsOpen(false);
         } catch (error) {
+          console.error('Reverse geocoding error:', error);
           setQuery("Current Location");
           onSelect({ name: "Current Location", lat: latitude, lng: longitude });
           setIsOpen(false);

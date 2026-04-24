@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, Car, List, Wallet, Leaf, TrendingUp, MessageCircle, User, ChevronDown } from "lucide-react";
+import { Search, Car, List, Wallet, Leaf, TrendingUp, MessageCircle, User, ChevronDown, LogOut } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import QuickRoutes from "@/components/QuickRoutes";

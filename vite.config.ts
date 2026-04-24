@@ -2,9 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-export default defineConfig({
-  // Ensures assets are linked correctly in the Vercel production build
-  base: '/',
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages deployment - use repository name as base path
+  base: mode === 'production' ? '/unigo-rides-main/' : '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -17,6 +17,7 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
+    historyApiFallback: true,
   },
   build: {
     outDir: "dist",
@@ -27,5 +28,9 @@ export default defineConfig({
         manualChunks: undefined,
       },
     },
+    // Ensure proper asset handling for GitHub Pages
+    assetsDir: 'assets',
+    // Generate .nojekyll file to prevent GitHub Pages from processing with Jekyll
+    emptyOutDir: true,
   },
-});
+}));

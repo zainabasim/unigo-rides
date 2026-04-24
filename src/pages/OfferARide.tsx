@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Car, Bike } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import LocationSearch from "@/components/LocationSearch";
@@ -12,6 +12,7 @@ import MapPicker from "@/components/MapPicker";
 const OfferARide = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [vehicleType, setVehicleType] = useState<"car" | "bike">("car");
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [area, setArea] = useState("Gulshan");
@@ -24,6 +25,13 @@ const OfferARide = () => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringDays, setRecurringDays] = useState<string[]>([]);
+
+  // Auto-set seats to 1 for bikes
+  useEffect(() => {
+    if (vehicleType === "bike") {
+      setSeats(1);
+    }
+  }, [vehicleType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +47,7 @@ const OfferARide = () => {
     
     const rideData = {
       driver_id: user.id,
+      vehicle_type: vehicleType,
       vehicle_model: vehicleModel,
       plate_number: plateNumber,
       origin,
@@ -84,9 +93,46 @@ const OfferARide = () => {
         <p className="text-muted-foreground text-sm mb-6">Help your colleagues commute to NED University</p>
 
         <div className="space-y-4 flex-1">
+          {/* Vehicle Type Toggle */}
+          <div>
+            <p className="text-sm font-medium text-foreground mb-2">Vehicle Type</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setVehicleType("car");
+                  setSeats(2);
+                }}
+                className={`flex-1 h-12 rounded-xl border-2 font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+                  vehicleType === "car"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/50"
+                }`}
+              >
+                <Car className="w-4 h-4" />
+                Car
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setVehicleType("bike");
+                  setSeats(1);
+                }}
+                className={`flex-1 h-12 rounded-xl border-2 font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+                  vehicleType === "bike"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/50"
+                }`}
+              >
+                <Bike className="w-4 h-4" />
+                Bike
+              </button>
+            </div>
+          </div>
+
           <input
             type="text"
-            placeholder="Toyota Corolla 2020"
+            placeholder={vehicleType === "car" ? "Toyota Corolla 2020" : "Honda CD70"}
             value={vehicleModel}
             onChange={(e) => setVehicleModel(e.target.value)}
             className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -255,23 +301,33 @@ const OfferARide = () => {
 
           {/* Available Seats */}
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">Available Seats</p>
+            <p className="text-sm font-medium text-foreground mb-2">
+              Available Seats {vehicleType === "bike" && "(Fixed for bikes)"}
+            </p>
             <div className="flex gap-3">
               {[1, 2, 3, 4].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => setSeats(num)}
+                  disabled={vehicleType === "bike"}
                   className={`w-12 h-12 rounded-xl border-2 font-semibold text-sm transition-colors ${
                     seats === num
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-background text-foreground hover:border-primary/50"
+                  } ${
+                    vehicleType === "bike" ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
                   {num}
                 </button>
               ))}
             </div>
+            {vehicleType === "bike" && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Bikes can only accommodate 1 passenger
+              </p>
+            )}
           </div>
         </div>
 

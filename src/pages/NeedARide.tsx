@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Car, Bike } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import LocationSearch from "@/components/LocationSearch";
@@ -228,10 +228,20 @@ const NeedARide = () => {
                 </div>
 
                 <div className="space-y-1 mb-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Vehicle:</span>
+                    <div className="flex items-center gap-1">
+                      {(ride as any).vehicle_type === "bike" ? (
+                        <Bike className="w-4 h-4 text-primary" />
+                      ) : (
+                        <Car className="w-4 h-4 text-primary" />
+                      )}
+                      <span className="text-card-foreground">{ride.vehicle_model}</span>
+                    </div>
+                  </div>
                   <p className="text-muted-foreground">From: <span className="text-card-foreground">{ride.origin}</span></p>
                   <p className="text-muted-foreground">To: <span className="text-card-foreground">{ride.destination}</span></p>
                   <p className="text-muted-foreground">Time: <span className="text-card-foreground">{ride.departure_time}</span></p>
-                  <p className="text-muted-foreground">Car: <span className="text-card-foreground">{ride.vehicle_model}</span></p>
                 </div>
 
                 <div className="flex items-center justify-between">

@@ -1,19 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
+// Mock Supabase Client - Offline Demo Mode
+import { mockSupabase } from '@/mock/mockService';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANONYMOUS_KEY;
+// Using mock service for offline demo
+// This completely bypasses Supabase and uses localStorage
+console.log('🚀 Using Mock Service - Offline Demo Mode');
 
-// Check if environment variables are defined
-if (!SUPABASE_URL) {
-  console.error('VITE_SUPABASE_URL is undefined. Please check your environment variables.');
-}
-if (!SUPABASE_PUBLISHABLE_KEY) {
-  console.error('VITE_SUPABASE_ANONYMOUS_KEY is undefined. Please check your environment variables.');
-}
+// Export mock service with same interface as real Supabase
+export const supabase = mockSupabase as any;
 
-// Debug environment variables
-console.log('Supabase URL:', SUPABASE_URL);
-console.log('Supabase Key exists:', !!SUPABASE_PUBLISHABLE_KEY);
-
-export const supabase = createClient<Database>(SUPABASE_URL || '', SUPABASE_PUBLISHABLE_KEY || '');
+// Re-export types for compatibility
+export type { Database };
