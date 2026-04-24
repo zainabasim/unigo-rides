@@ -5,6 +5,7 @@ export type User = {
   email: string;
   full_name: string;
   phone: string;
+  password: string;
   created_at: string;
 };
 
@@ -20,6 +21,7 @@ export const mockUsers: User[] = [
     email: "ali.khan@cloud.neduet.edu.pk",
     full_name: "Ali Khan",
     phone: "03123456789",
+    password: "password123",
     created_at: new Date().toISOString(),
   },
   {
@@ -27,6 +29,7 @@ export const mockUsers: User[] = [
     email: "sara.ahmed@cloud.neduet.edu.pk",
     full_name: "Sara Ahmed",
     phone: "03234567890",
+    password: "password123",
     created_at: new Date().toISOString(),
   },
   {
@@ -34,6 +37,7 @@ export const mockUsers: User[] = [
     email: "umar.farooq@cloud.neduet.edu.pk", 
     full_name: "Umar Farooq",
     phone: "03345678901",
+    password: "password123",
     created_at: new Date().toISOString(),
   },
 ];

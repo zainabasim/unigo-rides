@@ -123,6 +123,7 @@ const signUp = async ({ email, password, options }: { email: string; password: s
     email,
     full_name: options?.data?.full_name || "",
     phone: options?.data?.phone || "",
+    password,
     created_at: new Date().toISOString(),
   };
 
@@ -159,6 +160,11 @@ const signInWithPassword = async ({ email, password }: { email: string; password
   const user = users.find(u => u.email === email);
   
   if (!user) {
+    return { data: null, error: { message: "Invalid credentials" } };
+  }
+
+  // Validate password (for mock mode, all users have password "password123")
+  if (user.password !== password) {
     return { data: null, error: { message: "Invalid credentials" } };
   }
 
