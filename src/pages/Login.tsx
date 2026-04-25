@@ -20,26 +20,20 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('🔐 LOGIN HANDLER CALLED: ' + email); // Debug message
 
     const normalizedEmail = email.trim().toLowerCase();
-    alert('📧 Normalized email: ' + normalizedEmail); // Debug message
 
     if (!normalizedEmail.endsWith("@neduet.edu.pk") && !normalizedEmail.endsWith("@cloud.neduet.edu.pk")) {
-      alert('❌ Invalid email domain'); // Debug message
       toast.error("Only @neduet.edu.pk or @cloud.neduet.edu.pk emails are allowed");
       return;
     }
 
     setLoading(true);
-    alert('🚀 Calling supabase.auth.signInWithPassword'); // Debug message
 
     const { error: authError } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
       password,
     });
-    
-    alert('📥 Auth result: ' + (authError ? authError.message : 'Success')); // Debug message
 
     if (authError) {
       if (authError.message === "Invalid login credentials") {

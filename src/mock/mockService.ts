@@ -156,7 +156,6 @@ const signUp = async ({ email, password, options }: { email: string; password: s
 };
 
 const signInWithPassword = async ({ email, password }: { email: string; password: string }) => {
-  alert('🔐 MOCK AUTH CALLED: ' + email); // Very visible debug
   console.log('🔐 signInWithPassword called:', { email, password });
   const users = getUsers();
   console.log('👥 Existing users:', users.map(u => u.email));
@@ -215,6 +214,13 @@ const signInWithPassword = async ({ email, password }: { email: string; password
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
   console.log('🎉 Login successful for:', user.email);
+  
+  // Trigger auth state change callback to update UI
+  if (authStateChangeCallback) {
+    console.log('🔄 Triggering auth state change callback');
+    authStateChangeCallback("SIGNED_IN", session);
+  }
+  
   return { data: { session, user }, error: null };
 };
 
