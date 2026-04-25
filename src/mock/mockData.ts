@@ -40,6 +40,14 @@ export const mockUsers: User[] = [
     password: "password123",
     created_at: new Date().toISOString(),
   },
+  {
+    id: "4",
+    email: "zainab@cloud.neduet.edu.pk", 
+    full_name: "Zainab Asim",
+    phone: "03456789012",
+    password: "password123",
+    created_at: new Date().toISOString(),
+  },
 ];
 
 export const mockRides: Ride[] = [
