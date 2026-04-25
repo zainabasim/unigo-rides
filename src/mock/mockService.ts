@@ -156,24 +156,65 @@ const signUp = async ({ email, password, options }: { email: string; password: s
 };
 
 const signInWithPassword = async ({ email, password }: { email: string; password: string }) => {
+  alert('🔐 MOCK AUTH CALLED: ' + email); // Very visible debug
+  console.log('🔐 signInWithPassword called:', { email, password });
   const users = getUsers();
-  const user = users.find(u => u.email === email);
+  console.log('👥 Existing users:', users.map(u => u.email));
+  let user = users.find(u => u.email === email);
+  console.log('🔍 Found user:', user ? user.email : 'Not found');
   
+  // For testing: Auto-create user if they have valid university email but don't exist
   if (!user) {
-    return { data: null, error: { message: "Invalid credentials" } };
+    // Check if email has valid university domain
+    console.log('📧 Checking email domain:', email);
+    if (email.endsWith("@neduet.edu.pk") || email.endsWith("@cloud.neduet.edu.pk")) {
+      // Extract name from email for display purposes
+      const namePart = email.split('@')[0];
+      const formattedName = namePart.replace('.', ' ').replace(/_/g, ' ').split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      
+      user = {
+        id: Date.now().toString(),
+        email,
+        full_name: formattedName,
+        phone: "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0'),
+        password: "any", // Accept any password for testing
+        created_at: new Date().toISOString(),
+      };
+      
+      users.push(user);
+      saveUsers(users);
+      
+      // Create profile for new user
+      const profiles = getProfiles();
+      const newProfile = {
+        id: user.id,
+        user_id: user.id,
+        full_name: user.full_name,
+        department: "Computer Science",
+        designation: "Faculty Member",
+        green_score: Math.floor(Math.random() * 100),
+        total_rides: 0,
+        created_at: user.created_at
+      };
+      profiles.push(newProfile);
+      saveProfiles(profiles);
+    } else {
+      console.log('❌ Invalid email domain:', email);
+      return { data: null, error: { message: "Invalid credentials" } };
+    }
   }
 
-  // Validate password (for mock mode, all users have password "password123")
-  if (user.password !== password) {
-    return { data: null, error: { message: "Invalid credentials" } };
-  }
-
+  // For testing: Accept any password for university emails
+  console.log('✅ Creating session for user:', user.email);
   const session: MockSession = {
     user,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
+  console.log('🎉 Login successful for:', user.email);
   return { data: { session, user }, error: null };
 };
 
