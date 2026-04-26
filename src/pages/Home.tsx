@@ -164,40 +164,39 @@ const Home = () => {
         <img src={nedLogo} alt="NED University" className="w-12 h-12 object-contain mb-1" />
         <p className="text-xs text-muted-foreground">DEVELOPED BY S.ZAINAB ASIM | FE ELECTRONICS ENGINEERING DEPT. | NEDUET</p>
       </div>
-    </div>
 
-    {/* Chat System Modal */}
-    {showChat && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-96 max-h-[80vh] flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold">Messages</h2>
-            <button
-              onClick={() => setShowChat(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
+      {/* Chat System Modal */}
+      {showChat && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-96 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Messages</h2>
+              <button
+                onClick={() => setShowChat(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+            <ChatSystem 
+              currentUser={{
+                id: user?.id || "",
+                name: user?.user_metadata?.full_name || "User",
+                user_role: user?.user_metadata?.user_role || "passenger",
+                whatsapp: user?.user_metadata?.whatsapp || ""
+              }}
+              otherUser={{
+                id: "demo-user",
+                name: "Demo User",
+                user_role: "passenger",
+                whatsapp: "03123456789",
+                phone: "03123456789"
+              }}
+            />
           </div>
-          <ChatSystem 
-            currentUser={{
-              id: user?.id || "",
-              name: user?.user_metadata?.full_name || "User",
-              user_role: user?.user_metadata?.user_role || "passenger",
-              whatsapp: user?.user_metadata?.whatsapp || ""
-            }}
-            otherUser={{
-              id: "demo-user",
-              name: "Demo User",
-              user_role: "passenger",
-              whatsapp: "03123456789",
-              phone: "03123456789"
-            }}
-          />
         </div>
-      </div>
-    )}
-  </div>
+      )}
+    </div>
   );
 };
 

@@ -206,7 +206,6 @@ const QuickRoutes = () => {
                       <span className="text-xs text-primary font-medium">Offer one</span>
                     </div>
                   )}
-                </div>
               </div>
             </button>
           );
