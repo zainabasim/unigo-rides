@@ -162,7 +162,7 @@ const Home = () => {
       {/* Footer */}
       <div className="flex flex-col items-center py-4 border-t border-border">
         <img src={nedLogo} alt="NED University" className="w-12 h-12 object-contain mb-1" />
-        <p className="text-xs text-muted-foreground">FE ELECTRONICS ENGINEERING DEPARTMENT | NEDUET</p>
+        <p className="text-xs text-muted-foreground">DEVELOPED BY S.ZAINAB ASIM | FE ELECTRONICS ENGINEERING DEPT. | NEDUET</p>
       </div>
     </div>
 
