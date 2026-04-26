@@ -179,13 +179,8 @@ const QuickRoutes = () => {
                         PKR {formatPrice(route.price)}
                       </div>
                     )}
-                    {route.fuel_price && (
-                      <div className="text-xs text-blue-600 font-medium mt-1">
-                        +{formatPrice(route.fuel_price)} fuel
-                      </div>
-                    )}
                   </div>
-                  </div>
+                </div>
                 </div>
                 
                 <div className="text-right">

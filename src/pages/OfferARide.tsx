@@ -85,7 +85,6 @@ const OfferARide = () => {
       total_seats: seats,
       available_seats: seats,
       price: parseFloat(price) || 0,
-      fuel_price: parseFloat(price) || 0,
       area,
       is_active: true, // Mark ride as active immediately
       is_recurring: isRecurring,
@@ -235,24 +234,6 @@ const OfferARide = () => {
                 Suggested: {suggestedPrice}
               </div>
             )}
-            
-            <div className="text-xs text-muted-foreground">
-              <p className="font-medium">Current Fuel Prices:</p>
-              <div className="grid grid-cols-3 gap-2 mt-1">
-                <div>
-                  <span>Petrol:</span>
-                  <span className="font-medium">PKR {FUEL_PRICES.petrol}/L</span>
-                </div>
-                <div>
-                  <span>Diesel:</span>
-                  <span className="font-medium">PKR {FUEL_PRICES.diesel}/L</span>
-                </div>
-                <div>
-                  <span>CNG:</span>
-                  <span className="font-medium">PKR {FUEL_PRICES.cng}/kg</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Recurring Ride Option */}
