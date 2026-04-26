@@ -34,10 +34,16 @@ export const calculateDistance = (
   const R = 6371; // Earth's radius in km
   const dLat = (destinationCoords.lat - originCoords.lat) * Math.PI / 180;
   const dLng = (destinationCoords.lng - originCoords.lng) * Math.PI / 180;
-  const a = Math.sin(dLat) * Math.sin(dLat) + Math.cos(dLat) * Math.cos(dLat);
-  const c = Math.sin(dLat) * Math.sin(dLat) + Math.cos(dLat) * Math.cos(dLat);
+  
+  const lat1 = originCoords.lat * Math.PI / 180;
+  const lat2 = destinationCoords.lat * Math.PI / 180;
+  
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2);
+  const b = Math.cos(lat1) * Math.cos(lat2);
+  const c = Math.sin(dLat/2) * Math.sin(dLat/2) + b * b * Math.cos(dLng);
+  
   const angleC = Math.acos(c);
-  const distance = R * 2 * angleC;
+  const distance = R * angleC;
 
   return Math.round(distance * 100) / 100; // Convert to km and round
 };

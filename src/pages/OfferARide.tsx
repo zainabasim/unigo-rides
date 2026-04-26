@@ -39,12 +39,22 @@ const OfferARide = () => {
   const calculateSuggestedPrice = () => {
     if (!originCoords) return;
     
-    // Calculate distance to NED University (approximate)
-    const nedCoords = { lat: 24.9340, lng: 67.1113 };
-    const distance = calculateDistance(originCoords, nedCoords);
+    // Estimate commute distance based on area (more realistic than distance to NED)
+    let estimatedDistance = 15; // Default 15km commute
+    
+    // Adjust distance based on area for more realistic pricing
+    if (area.toLowerCase().includes('gulshan') || area.toLowerCase().includes('gulshan-e-block')) {
+      estimatedDistance = 12; // Gulshan to NED is shorter
+    } else if (area.toLowerCase().includes('north') || area.toLowerCase().includes('defence')) {
+      estimatedDistance = 18; // North areas are farther
+    } else if (area.toLowerCase().includes('clifton') || area.toLowerCase().includes('pechs')) {
+      estimatedDistance = 20; // Clifton/PECHS are farther
+    } else if (area.toLowerCase().includes('bahria') || area.toLowerCase().includes('dha')) {
+      estimatedDistance = 25; // Bahria Town areas are farthest
+    }
     
     const pricing = calculateRidePrice(
-      distance,
+      estimatedDistance,
       vehicleType,
       'petrol' // Default fuel type
     );
