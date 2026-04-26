@@ -14,7 +14,9 @@ const Register = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [password, setPassword] = useState("");
+  const [userRole, setUserRole] = useState<"driver" | "passenger">("passenger");
 
   // Validate email domain - only @cloud.neduet.edu.pk allowed
   const validateEmail = (email: string) => {
@@ -54,6 +56,8 @@ const Register = () => {
           data: {
             full_name: fullName,
             phone: phone.replace(/-/g, ""),
+            whatsapp: whatsapp.replace(/-/g, ""),
+            user_role: userRole,
           },
         },
       });
@@ -137,6 +141,51 @@ const Register = () => {
             <p className="text-xs text-muted-foreground mt-1 ml-1">
               Pakistan format: 03xxxxxxxxx
             </p>
+          </div>
+
+          <div>
+            <input
+              type="tel"
+              placeholder="WhatsApp Number (03xxxxxxxxx)"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ""))}
+              className="w-full p-4 border border-border rounded-xl bg-background text-foreground focus:border-[#00D154] focus:outline-none"
+              maxLength={11}
+              required
+            />
+            <p className="text-xs text-muted-foreground mt-1 ml-1">
+              WhatsApp format: 03xxxxxxxxx
+            </p>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-foreground mb-2 block">
+              I am a:
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="passenger"
+                  checked={userRole === "passenger"}
+                  onChange={(e) => setUserRole(e.target.value as "driver" | "passenger")}
+                  className="mr-2"
+                />
+                <span className="text-sm">Passenger</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="role"
+                  value="driver"
+                  checked={userRole === "driver"}
+                  onChange={(e) => setUserRole(e.target.value as "driver" | "passenger")}
+                  className="mr-2"
+                />
+                <span className="text-sm">Driver</span>
+              </label>
+            </div>
           </div>
 
           <div>

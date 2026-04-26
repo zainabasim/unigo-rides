@@ -7,12 +7,14 @@ import nedLogo from "@/assets/ned-logo.png";
 import QuickRoutes from "@/components/QuickRoutes";
 import SavingsDashboard from "@/components/SavingsDashboard";
 import WalletLedger from "@/components/WalletLedger";
+import ChatSystem from "@/components/ChatSystem";
 
 const Home = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const [activeTab, setActiveTab] = useState<"routes" | "savings" | "wallet">("routes");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -45,6 +47,16 @@ const Home = () => {
                 >
                   <User className="w-4 h-4 text-primary" />
                   <span className="text-sm text-foreground">My Profile</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setShowChat(true);
+                  }}
+                  className="w-full px-4 py-2 text-left hover:bg-muted transition-colors flex items-center gap-3"
+                >
+                  <MessageCircle className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-foreground">Messages</span>
                 </button>
                 <button
                   onClick={() => {
@@ -153,6 +165,39 @@ const Home = () => {
         <p className="text-xs text-muted-foreground">FE ELECTRONICS ENGINEERING DEPARTMENT | NEDUET</p>
       </div>
     </div>
+
+    {/* Chat System Modal */}
+    {showChat && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-96 max-h-[80vh] flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="text-lg font-semibold">Messages</h2>
+            <button
+              onClick={() => setShowChat(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ×
+            </button>
+          </div>
+          <ChatSystem 
+            currentUser={{
+              id: user?.id || "",
+              name: user?.user_metadata?.full_name || "User",
+              user_role: user?.user_metadata?.user_role || "passenger",
+              whatsapp: user?.user_metadata?.whatsapp || ""
+            }}
+            otherUser={{
+              id: "demo-user",
+              name: "Demo User",
+              user_role: "passenger",
+              whatsapp: "03123456789",
+              phone: "03123456789"
+            }}
+          />
+        </div>
+      </div>
+    )}
+  </div>
   );
 };
 

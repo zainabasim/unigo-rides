@@ -5,6 +5,8 @@ export type User = {
   email: string;
   full_name: string;
   phone: string;
+  whatsapp: string;
+  user_role: "driver" | "passenger";
   password: string;
   created_at: string;
 };
@@ -21,6 +23,8 @@ export const mockUsers: User[] = [
     email: "ali.khan@cloud.neduet.edu.pk",
     full_name: "Ali Khan",
     phone: "03123456789",
+    whatsapp: "03123456789",
+    user_role: "driver" as const,
     password: "password123",
     created_at: new Date().toISOString(),
   },
@@ -29,6 +33,8 @@ export const mockUsers: User[] = [
     email: "sara.ahmed@cloud.neduet.edu.pk",
     full_name: "Sara Ahmed",
     phone: "03234567890",
+    whatsapp: "03234567890",
+    user_role: "passenger" as const,
     password: "password123",
     created_at: new Date().toISOString(),
   },
@@ -37,6 +43,8 @@ export const mockUsers: User[] = [
     email: "umar.farooq@cloud.neduet.edu.pk", 
     full_name: "Umar Farooq",
     phone: "03345678901",
+    whatsapp: "03345678901",
+    user_role: "driver" as const,
     password: "password123",
     created_at: new Date().toISOString(),
   },
@@ -45,6 +53,8 @@ export const mockUsers: User[] = [
     email: "zainab@cloud.neduet.edu.pk", 
     full_name: "Zainab Asim",
     phone: "03456789012",
+    whatsapp: "03456789012",
+    user_role: "passenger" as const,
     password: "password123",
     created_at: new Date().toISOString(),
   },

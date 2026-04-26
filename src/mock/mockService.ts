@@ -123,6 +123,8 @@ const signUp = async ({ email, password, options }: { email: string; password: s
     email,
     full_name: options?.data?.full_name || "",
     phone: options?.data?.phone || "",
+    whatsapp: options?.data?.whatsapp || "",
+    user_role: options?.data?.user_role || "passenger",
     password,
     created_at: new Date().toISOString(),
   };

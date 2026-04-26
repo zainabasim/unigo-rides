@@ -36,8 +36,8 @@ const Login = () => {
     });
 
     if (authError) {
-      if (authError.message === "Invalid login credentials") {
-        toast.error("Invalid email or password. Please try again.");
+      if (authError.message === "Invalid credentials") {
+        toast.error("You don't have an account. Please first register yourself.");
       } else {
         toast.error(authError.message);
       }
