@@ -279,7 +279,7 @@ const Profile = () => {
       {/* Footer */}
       <div className="flex flex-col items-center py-4 border-t border-border">
         <img src={nedLogo} alt="NED University" className="w-8 h-8 object-contain mb-1" />
-        <p className="text-xs text-muted-foreground">Developed by Zainab Asim | NEDUET</p>
+        <p className="text-xs text-muted-foreground">FE electronic engineering dept</p>
       </div>
     </div>
   );

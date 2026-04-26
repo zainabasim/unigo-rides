@@ -110,7 +110,7 @@ const Login = () => {
 
         <div className="mt-12 text-center">
           <img src={nedLogo} alt="NED University" className="w-16 h-16 object-contain mx-auto mb-2" />
-          <p className="text-xs text-muted-foreground">Developed by Zainab Asim | NEDUET</p>
+          <p className="text-xs text-muted-foreground">FE electronic engineering dept</p>
         </div>
       </div>
     </div>
