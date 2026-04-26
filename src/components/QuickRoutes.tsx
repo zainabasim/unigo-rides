@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Home, MapPin, Clock, ArrowRight, Star, Plus } from "lucide-react";
+import { calculateDistance, calculateRidePrice, formatPrice } from "@/utils/pricing";
 
 interface QuickRoute {
   id: string;
@@ -14,6 +15,8 @@ interface QuickRoute {
   originCoords?: { lat: number; lng: number };
   destinationCoords?: { lat: number; lng: number };
   departureTime: string;
+  price?: number;
+  fuelPrice?: number;
   isDefault?: boolean;
 }
 
@@ -171,6 +174,17 @@ const QuickRoutes = () => {
                       <Clock className="w-3 h-3" />
                       {route.departureTime}
                     </div>
+                    {route.price && (
+                      <div className="text-xs text-green-600 font-medium mt-1">
+                        PKR {formatPrice(route.price)}
+                      </div>
+                    )}
+                    {route.fuel_price && (
+                      <div className="text-xs text-blue-600 font-medium mt-1">
+                        +{formatPrice(route.fuel_price)} fuel
+                      </div>
+                    )}
+                  </div>
                   </div>
                 </div>
                 

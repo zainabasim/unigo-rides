@@ -8,6 +8,7 @@ import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import LocationSearch from "@/components/LocationSearch";
 import MapPicker from "@/components/MapPicker";
+import { calculateDistance, calculateRidePrice, formatPrice, FUEL_PRICES } from "@/utils/pricing";
 
 const OfferARide = () => {
   const navigate = useNavigate();
@@ -21,17 +22,35 @@ const OfferARide = () => {
   const [departureTime, setDepartureTime] = useState("");
   const [seats, setSeats] = useState(2);
   const [price, setPrice] = useState("");
+  const [suggestedPrice, setSuggestedPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringDays, setRecurringDays] = useState<string[]>([]);
 
-  // Auto-set seats to 1 for bikes
+  // Auto-set seats to 1 for bikes and calculate suggested price
   useEffect(() => {
     if (vehicleType === "bike") {
       setSeats(1);
     }
-  }, [vehicleType]);
+    calculateSuggestedPrice();
+  }, [vehicleType, originCoords]);
+
+  const calculateSuggestedPrice = () => {
+    if (!originCoords) return;
+    
+    // Calculate distance to NED University (approximate)
+    const nedCoords = { lat: 24.9340, lng: 67.1113 };
+    const distance = calculateDistance(originCoords, nedCoords);
+    
+    const pricing = calculateRidePrice(
+      distance,
+      vehicleType,
+      'petrol' // Default fuel type
+    );
+    
+    setSuggestedPrice(formatPrice(pricing.suggestedPrice));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +75,7 @@ const OfferARide = () => {
       total_seats: seats,
       available_seats: seats,
       price: parseFloat(price) || 0,
+      fuel_price: parseFloat(price) || 0,
       area,
       is_recurring: isRecurring,
       recurring_days: recurringDays,
@@ -187,16 +207,42 @@ const OfferARide = () => {
             required
           />
 
-          <input
-            type="number"
-            placeholder="Price (e.g. 5)"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            min="0"
-            step="0.5"
-            required
-          />
+          <div className="space-y-2">
+            <input
+              type="number"
+              placeholder="Price (e.g. 5)"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              min="0"
+              step="0.5"
+              required
+            />
+            
+            {suggestedPrice && (
+              <div className="text-xs text-green-600 font-medium">
+                Suggested: {suggestedPrice}
+              </div>
+            )}
+            
+            <div className="text-xs text-muted-foreground">
+              <p className="font-medium">Current Fuel Prices:</p>
+              <div className="grid grid-cols-3 gap-2 mt-1">
+                <div>
+                  <span>Petrol:</span>
+                  <span className="font-medium">PKR {FUEL_PRICES.petrol}/L</span>
+                </div>
+                <div>
+                  <span>Diesel:</span>
+                  <span className="font-medium">PKR {FUEL_PRICES.diesel}/L</span>
+                </div>
+                <div>
+                  <span>CNG:</span>
+                  <span className="font-medium">PKR {FUEL_PRICES.cng}/kg</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Recurring Ride Option */}
           <div className="mb-6">

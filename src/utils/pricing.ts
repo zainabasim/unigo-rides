@@ -1,0 +1,95 @@
+// Pricing calculation utilities
+
+export interface FuelPrices {
+  petrol: number;
+  diesel: number;
+  cng: number;
+}
+
+export interface PricingCalculation {
+  basePrice: number;
+  fuelCost: number;
+  totalPrice: number;
+  suggestedPrice: number;
+}
+
+// Current fuel prices in Pakistan (approximate)
+export const FUEL_PRICES: FuelPrices = {
+  petrol: 280, // PKR per liter
+  diesel: 300,  // PKR per liter
+  cng: 200,  // PKR per kg
+};
+
+// Average fuel consumption rates (km per liter)
+export const FUEL_EFFICIENCY = {
+  car: 0.08,  // 8 km per liter
+  bike: 0.03,  // 33 km per liter
+};
+
+// Calculate distance between two coordinates
+export const calculateDistance = (
+  originCoords: { lat: number; lng: number },
+  destinationCoords: { lat: number; lng: number }
+): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (destinationCoords.lat - originCoords.lat) * Math.PI / 180;
+  const dLng = (destinationCoords.lng - originCoords.lng) * Math.PI / 180;
+  const a = Math.sin(dLat) * Math.sin(dLat) + Math.cos(dLat) * Math.cos(dLat);
+  const c = Math.sin(dLat) * Math.sin(dLat) + Math.cos(dLat) * Math.cos(dLat);
+  const angleC = Math.acos(c);
+  const distance = R * 2 * angleC;
+
+  return Math.round(distance * 100) / 100; // Convert to km and round
+};
+
+// Calculate fuel cost based on vehicle type and distance
+export const calculateFuelCost = (
+  distance: number,
+  vehicleType: 'car' | 'bike',
+  fuelType: 'petrol' | 'diesel' | 'cng' = 'petrol'
+): number => {
+  const efficiency = FUEL_EFFICIENCY[vehicleType];
+  const fuelPrice = FUEL_PRICES[fuelType];
+  const fuelNeeded = (distance / 1000) * efficiency; // liters needed
+  
+  return Math.round(fuelNeeded * fuelPrice);
+};
+
+// Calculate total ride cost
+export const calculateRidePrice = (
+  distance: number,
+  vehicleType: 'car' | 'bike',
+  fuelType: 'petrol' | 'diesel' | 'cng' = 'petrol',
+  baseRate: number = 5 // PKR per km base rate
+): PricingCalculation => {
+  const fuelCost = calculateFuelCost(distance, vehicleType, fuelType);
+  
+  // Calculate base price (distance * rate)
+  let totalPrice = distance * baseRate;
+  
+  // Add fuel cost for cars (bikes typically don't charge for fuel)
+  if (vehicleType === 'car') {
+    totalPrice += fuelCost;
+  }
+  
+  // Add 20% commission for platform
+  const commission = totalPrice * 0.2;
+  totalPrice += commission;
+
+  return {
+    basePrice: distance * baseRate,
+    fuelCost: Math.round(fuelCost),
+    totalPrice: Math.round(totalPrice),
+    suggestedPrice: Math.round(totalPrice * 1.1) // 10% higher for profit margin
+  };
+};
+
+// Format price display
+export const formatPrice = (amount: number): string => {
+  return new Intl.NumberFormat('en-PK', {
+    style: 'currency',
+    currency: 'PKR',
+    minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+  }).format(amount);
+};
