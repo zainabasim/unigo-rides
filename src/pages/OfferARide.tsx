@@ -87,6 +87,7 @@ const OfferARide = () => {
       price: parseFloat(price) || 0,
       fuel_price: parseFloat(price) || 0,
       area,
+      is_active: true, // Mark ride as active immediately
       is_recurring: isRecurring,
       recurring_days: recurringDays,
       recurring_time: departureTime,
