@@ -220,7 +220,7 @@ const OfferARide = () => {
           <div className="space-y-2">
             <input
               type="number"
-              placeholder="Price (e.g. 5)"
+              placeholder="Set your fare for per seat"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
