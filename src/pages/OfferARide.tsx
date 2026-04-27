@@ -167,7 +167,7 @@ const OfferARide = () => {
             placeholder={vehicleType === "car" ? "Toyota Corolla 2020" : "Honda CD70"}
             value={vehicleModel}
             onChange={(e) => setVehicleModel(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
           <input
@@ -175,7 +175,7 @@ const OfferARide = () => {
             placeholder="ABC-123"
             value={plateNumber}
             onChange={(e) => setPlateNumber(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
 
@@ -184,7 +184,7 @@ const OfferARide = () => {
             <select
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              className="w-full h-12 rounded-xl border border-border bg-background px-4 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full h-12 rounded-xl border border-border bg-background px-4 pr-10 text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {areas.map((a) => (
                 <option key={a} value={a}>{a}</option>
@@ -195,7 +195,7 @@ const OfferARide = () => {
 
           {/* Pickup Location */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Pickup Location</label>
+            <label className="text-sm font-medium text-white">Pickup Location</label>
             <LocationSearch
               placeholder="Enter pickup location..."
               value={pickupLocation}
@@ -214,13 +214,13 @@ const OfferARide = () => {
               onClick={swapLocations}
               className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
             >
-              <ArrowUpDown className="w-4 h-4 text-foreground" />
+              <ArrowUpDown className="w-4 h-4 text-white" />
             </button>
           </div>
 
           {/* Destination */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Destination</label>
+            <label className="text-sm font-medium text-white">Destination</label>
             <LocationSearch
               placeholder="Enter destination..."
               value={destination}
@@ -248,7 +248,7 @@ const OfferARide = () => {
             placeholder="8:00 AM"
             value={departureTime}
             onChange={(e) => setDepartureTime(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
 
@@ -258,7 +258,7 @@ const OfferARide = () => {
               placeholder="Set your fare for per seat"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
               min="0"
               step="0.5"
               required
@@ -302,10 +302,10 @@ const OfferARide = () => {
 
           {isRecurring && (
             <div className="rounded-xl border border-border bg-card p-4 mb-6">
-              <h4 className="font-semibold text-foreground mb-3">Set Weekly Schedule</h4>
+              <h4 className="font-semibold text-white mb-3">Set Weekly Schedule</h4>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Select Days
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -333,14 +333,14 @@ const OfferARide = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Departure Time
                   </label>
                   <input
                     type="time"
                     value={departureTime}
                     onChange={(e) => setDepartureTime(e.target.value)}
-                    className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
                     required
                   />
                 </div>
@@ -374,7 +374,7 @@ const OfferARide = () => {
 
           {/* Available Seats */}
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">
+            <p className="text-sm font-medium text-white mb-2">
               Available Seats {vehicleType === "bike" && "(Fixed for bikes)"}
             </p>
             <div className="flex gap-3">
@@ -387,7 +387,7 @@ const OfferARide = () => {
                   className={`w-12 h-12 rounded-xl border-2 font-semibold text-sm transition-colors ${
                     seats === num
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:border-primary/50"
+                      : "border-border bg-background text-white hover:border-primary/50"
                   } ${
                     vehicleType === "bike" ? "opacity-50 cursor-not-allowed" : ""
                   }`}
@@ -397,7 +397,7 @@ const OfferARide = () => {
               ))}
             </div>
             {vehicleType === "bike" && (
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-gray-400 mt-2">
                 Bikes can only accommodate 1 passenger
               </p>
             )}
