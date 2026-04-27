@@ -17,7 +17,6 @@ const OfferARide = () => {
   const [vehicleType, setVehicleType] = useState<"car" | "bike">("car");
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
-  const [area, setArea] = useState("Gulshan");
   const [pickupLocation, setPickupLocation] = useState("");
   const [pickupCoords, setPickupCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [destination, setDestination] = useState("NED University");
@@ -97,7 +96,6 @@ const OfferARide = () => {
       total_seats: seats,
       available_seats: seats,
       price: parseFloat(price) || 0,
-      area,
       is_active: true, // Mark ride as active immediately
       is_recurring: isRecurring,
       recurring_days: recurringDays,
@@ -116,7 +114,6 @@ const OfferARide = () => {
     }
   };
 
-  const areas = ["Gulshan", "North Nazimabad", "Clifton", "Saddar", "Korangi", "Defence"];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -188,20 +185,6 @@ const OfferARide = () => {
             className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
-
-          {/* Area Dropdown */}
-          <div className="relative">
-            <select
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              className="w-full h-12 rounded-xl border border-border bg-background px-4 pr-10 text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {areas.map((a) => (
-                <option key={a} value={a}>{a}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-          </div>
 
           {/* Pickup Location */}
           <div className="space-y-2">
