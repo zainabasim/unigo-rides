@@ -175,6 +175,7 @@ const OfferARide = () => {
             value={vehicleModel}
             onChange={(e) => setVehicleModel(e.target.value)}
             className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+            style={{ color: 'black !important' }}
             required
           />
           <input
@@ -183,6 +184,7 @@ const OfferARide = () => {
             value={plateNumber}
             onChange={(e) => setPlateNumber(e.target.value)}
             className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+            style={{ color: 'black !important' }}
             required
           />
 
@@ -301,6 +303,7 @@ const OfferARide = () => {
             value={departureTime}
             onChange={(e) => setDepartureTime(e.target.value)}
             className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+            style={{ color: 'black !important' }}
             required
           />
 
@@ -311,6 +314,7 @@ const OfferARide = () => {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+              style={{ color: 'black !important' }}
               min="0"
               step="0.5"
               required
