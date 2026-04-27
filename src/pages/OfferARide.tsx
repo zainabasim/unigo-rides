@@ -235,9 +235,27 @@ const OfferARide = () => {
               <label className="text-sm font-medium text-white">Pickup Location Map (Click to set pickup)</label>
               <MapPicker
                 initialLocation={pickupCoords}
-                onLocationSelect={(location) => {
+                onLocationSelect={async (location) => {
                   console.log('Pickup location updated from map:', location);
                   setPickupCoords(location);
+                  
+                  // Perform reverse geocoding to get location name
+                  try {
+                    const reverseUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`;
+                    const res = await fetch(reverseUrl);
+                    
+                    if (res.ok) {
+                      const data = await res.json();
+                      const locationName = data.display_name?.split(",").slice(0, 3).join(", ") || `Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`;
+                      setPickupLocation(locationName);
+                    } else {
+                      // Fallback to coordinates if reverse geocoding fails
+                      setPickupLocation(`Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`);
+                    }
+                  } catch (error) {
+                    console.error('Reverse geocoding error:', error);
+                    setPickupLocation(`Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`);
+                  }
                 }}
                 height="200px"
               />
@@ -250,9 +268,27 @@ const OfferARide = () => {
               <label className="text-sm font-medium text-white">Destination Location Map (Click to set destination)</label>
               <MapPicker
                 initialLocation={destinationCoords}
-                onLocationSelect={(location) => {
+                onLocationSelect={async (location) => {
                   console.log('Destination location updated from map:', location);
                   setDestinationCoords(location);
+                  
+                  // Perform reverse geocoding to get location name
+                  try {
+                    const reverseUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}`;
+                    const res = await fetch(reverseUrl);
+                    
+                    if (res.ok) {
+                      const data = await res.json();
+                      const locationName = data.display_name?.split(",").slice(0, 3).join(", ") || `Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`;
+                      setDestination(locationName);
+                    } else {
+                      // Fallback to coordinates if reverse geocoding fails
+                      setDestination(`Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`);
+                    }
+                  } catch (error) {
+                    console.error('Reverse geocoding error:', error);
+                    setDestination(`Location (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`);
+                  }
                 }}
                 height="200px"
               />
