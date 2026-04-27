@@ -315,13 +315,13 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
       {isOpen && (
         <div className="absolute z-[9999] mt-1 w-full rounded-xl border-2 border-primary/20 bg-black/95 backdrop-blur-sm shadow-2xl shadow-primary/20 max-h-64 overflow-y-auto">
           {loading ? (
-            <div className="p-4 text-sm text-primary text-center animate-pulse">
+            <div className="p-4 text-sm text-white text-center animate-pulse">
               <div className="flex items-center justify-center gap-2">
                 <div className="w-2 h-2 bg-neon-green rounded-full animate-bounce" />
                 <div className="w-2 h-2 bg-neon-green rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                 <div className="w-2 h-2 bg-neon-green rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
               </div>
-              <span className="ml-2">Searching Karachi areas...</span>
+              <span className="ml-2 text-white">Searching Karachi areas...</span>
             </div>
           ) : (
             results.map((result, i) => {
@@ -347,7 +347,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
                     {icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className={`text-foreground line-clamp-2 font-medium ${
+                    <span className={`text-white line-clamp-2 font-medium ${
                       isHighlighted ? 'text-primary' : ''
                     }`}>
                       {locationName}
@@ -360,7 +360,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
                     )}
                   </div>
                   {isKarachiArea && (
-                    <div className="text-xs text-primary/60 shrink-0">
+                    <div className="text-xs text-gray-400 shrink-0">
                       24.{result.lat.toFixed(2)}°N, 67.{result.lng.toFixed(2)}°E
                     </div>
                   )}
@@ -370,12 +370,12 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
           )}
           
           {results.length === 0 && !loading && (
-            <div className="p-4 text-center">
-              <div className="text-primary/60 text-sm mb-2">
+            <div className="p-4 text-center text-white">
+              <div className="text-sm text-gray-400 mb-2">
                 <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                No locations found
+                <p className="text-sm text-gray-400">No locations found</p>
               </div>
-              <p className="text-xs text-primary/40">
+              <p className="text-xs text-gray-400">
                 Try searching for areas like "Gulshan", "Clifton", or "DHA"
               </p>
             </div>
