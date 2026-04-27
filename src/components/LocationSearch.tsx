@@ -291,6 +291,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="w-full h-12 rounded-xl border-2 border-primary/30 bg-black/80 backdrop-blur-sm pl-10 pr-20 text-sm text-white placeholder:text-primary/70 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/40 focus:bg-black/90 transition-all duration-200"
+          style={{ color: 'white !important' }}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
           {query && (
