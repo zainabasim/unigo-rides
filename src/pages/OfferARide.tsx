@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ChevronDown, Car, Bike } from "lucide-react";
+import { ChevronDown, Car, Bike, ArrowUpDown, MapPin } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import LocationSearch from "@/components/LocationSearch";
 import MapPicker from "@/components/MapPicker";
 import { calculateDistance, calculateRidePrice, formatPrice, FUEL_PRICES } from "@/utils/pricing";
+import { ALL_LOCATIONS } from "@/constants/landmarks";
 
 const OfferARide = () => {
   const navigate = useNavigate();
@@ -17,8 +18,10 @@ const OfferARide = () => {
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [area, setArea] = useState("Gulshan");
-  const [origin, setOrigin] = useState("");
-  const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [pickupLocation, setPickupLocation] = useState("");
+  const [pickupCoords, setPickupCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [destination, setDestination] = useState("NED University");
+  const [destinationCoords, setDestinationCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [departureTime, setDepartureTime] = useState("");
   const [seats, setSeats] = useState(2);
   const [price, setPrice] = useState("");
@@ -34,27 +37,26 @@ const OfferARide = () => {
       setSeats(1);
     }
     calculateSuggestedPrice();
-  }, [vehicleType, originCoords]);
+  }, [vehicleType, pickupCoords, destinationCoords]);
+
+  // Swap pickup and destination
+  const swapLocations = () => {
+    const tempLocation = pickupLocation;
+    const tempCoords = pickupCoords;
+    setPickupLocation(destination);
+    setPickupCoords(destinationCoords);
+    setDestination(tempLocation);
+    setDestinationCoords(tempCoords);
+  };
 
   const calculateSuggestedPrice = () => {
-    if (!originCoords) return;
+    if (!pickupCoords || !destinationCoords) return;
     
-    // Estimate commute distance based on area (more realistic than distance to NED)
-    let estimatedDistance = 15; // Default 15km commute
-    
-    // Adjust distance based on area for more realistic pricing
-    if (area.toLowerCase().includes('gulshan') || area.toLowerCase().includes('gulshan-e-block')) {
-      estimatedDistance = 12; // Gulshan to NED is shorter
-    } else if (area.toLowerCase().includes('north') || area.toLowerCase().includes('defence')) {
-      estimatedDistance = 18; // North areas are farther
-    } else if (area.toLowerCase().includes('clifton') || area.toLowerCase().includes('pechs')) {
-      estimatedDistance = 20; // Clifton/PECHS are farther
-    } else if (area.toLowerCase().includes('bahria') || area.toLowerCase().includes('dha')) {
-      estimatedDistance = 25; // Bahria Town areas are farthest
-    }
+    // Calculate actual distance between pickup and destination
+    const distance = calculateDistance(pickupCoords, destinationCoords);
     
     const pricing = calculateRidePrice(
-      estimatedDistance,
+      distance,
       vehicleType,
       'petrol' // Default fuel type
     );
@@ -67,8 +69,8 @@ const OfferARide = () => {
     if (!user) return;
 
     // Validate that coordinates are available
-    if (!originCoords) {
-      toast.error("Please select a pickup location on the map");
+    if (!pickupCoords || !destinationCoords) {
+      toast.error("Please select both pickup and destination locations");
       return;
     }
 
@@ -79,8 +81,8 @@ const OfferARide = () => {
       vehicle_type: vehicleType,
       vehicle_model: vehicleModel,
       plate_number: plateNumber,
-      origin,
-      destination: "NED University",
+      origin: pickupLocation,
+      destination: destination,
       departure_time: departureTime,
       total_seats: seats,
       available_seats: seats,
@@ -191,21 +193,54 @@ const OfferARide = () => {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
           </div>
 
-          <LocationSearch
-            placeholder="Enter pickup location..."
-            value={origin}
-            onSelect={(location) => {
-              setOrigin(location.name);
-              setOriginCoords({ lat: location.lat, lng: location.lng });
-            }}
-          />
-
-          {originCoords && (
-            <MapPicker
-              initialLocation={originCoords}
-              onLocationSelect={(location) => setOriginCoords(location)}
-              height="200px"
+          {/* Pickup Location */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Pickup Location</label>
+            <LocationSearch
+              placeholder="Enter pickup location..."
+              value={pickupLocation}
+              onSelect={(location) => {
+                setPickupLocation(location.name);
+                setPickupCoords({ lat: location.lat, lng: location.lng });
+              }}
+              suggestions={ALL_LOCATIONS}
             />
+          </div>
+
+          {/* Swap Button */}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={swapLocations}
+              className="p-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            >
+              <ArrowUpDown className="w-4 h-4 text-foreground" />
+            </button>
+          </div>
+
+          {/* Destination */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Destination</label>
+            <LocationSearch
+              placeholder="Enter destination..."
+              value={destination}
+              onSelect={(location) => {
+                setDestination(location.name);
+                setDestinationCoords({ lat: location.lat, lng: location.lng });
+              }}
+              suggestions={ALL_LOCATIONS}
+            />
+          </div>
+
+          {pickupCoords && destinationCoords && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Route Preview</label>
+              <MapPicker
+                initialLocation={pickupCoords}
+                onLocationSelect={(location) => setPickupCoords(location)}
+                height="200px"
+              />
+            </div>
           )}
 
           <input

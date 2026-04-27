@@ -61,32 +61,33 @@ export const calculateFuelCost = (
   return Math.round(fuelNeeded * fuelPrice);
 };
 
-// Calculate total ride cost
+// Calculate total ride cost with Yango-style dynamic pricing
 export const calculateRidePrice = (
   distance: number,
   vehicleType: 'car' | 'bike',
-  fuelType: 'petrol' | 'diesel' | 'cng' = 'petrol',
-  baseRate: number = 5 // PKR per km base rate
+  fuelType: 'petrol' | 'diesel' | 'cng' = 'petrol'
 ): PricingCalculation => {
-  const fuelCost = calculateFuelCost(distance, vehicleType, fuelType);
+  // Base Price: 50 PKR
+  let totalPrice = 50;
   
-  // Calculate base price (distance * rate)
-  let totalPrice = distance * baseRate;
-  
-  // Add fuel cost for cars (bikes typically don't charge for fuel)
+  // Vehicle Multiplier: Add 20 PKR if Car, 0 PKR if Bike
   if (vehicleType === 'car') {
-    totalPrice += fuelCost;
+    totalPrice += 20;
   }
+  
+  // Distance Factor: Add random variation between 10-100 PKR to simulate different distances from campus
+  const distanceFactor = Math.floor(Math.random() * 91) + 10; // Random between 10-100
+  totalPrice += distanceFactor;
   
   // Add 20% commission for platform
   const commission = totalPrice * 0.2;
   totalPrice += commission;
 
   return {
-    basePrice: distance * baseRate,
-    fuelCost: Math.round(fuelCost),
+    basePrice: 50 + (vehicleType === 'car' ? 20 : 0),
+    fuelCost: distanceFactor,
     totalPrice: Math.round(totalPrice),
-    suggestedPrice: Math.round(totalPrice * 1.1) // 10% higher for profit margin
+    suggestedPrice: Math.round(totalPrice) // Direct price without extra margin
   };
 };
 

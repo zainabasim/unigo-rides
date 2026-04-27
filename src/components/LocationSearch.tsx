@@ -22,6 +22,7 @@ interface LocationSearchProps {
   placeholder?: string;
   onSelect: (location: { name: string; lat: number; lng: number }) => void;
   value?: string;
+  suggestions?: string[];
 }
 
 // Karachi Areas Database
@@ -67,7 +68,7 @@ const KARACHI_AREAS: KarachiArea[] = [
   { name: "empress market", displayName: "Empress Market", lat: 24.8667, lng: 67.0333, type: "landmark", icon: <MapPin className="w-4 h-4" /> },
 ];
 
-const LocationSearch = ({ placeholder = "Search location...", onSelect, value }: LocationSearchProps) => {
+const LocationSearch = ({ placeholder = "Search location...", onSelect, value, suggestions }: LocationSearchProps) => {
   const [query, setQuery] = useState(value || "");
   const [results, setResults] = useState<(LocationResult | KarachiArea)[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -100,11 +101,30 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
     setLoading(true);
     
     try {
-      // First search Karachi areas database
-      const karachiMatches = KARACHI_AREAS.filter(area => 
-        area.name.toLowerCase().includes(q.toLowerCase()) ||
-        area.displayName.toLowerCase().includes(q.toLowerCase())
-      );
+      let matchedResults: (LocationResult | KarachiArea)[] = [];
+      
+      // If custom suggestions are provided, use them first
+      if (suggestions && suggestions.length > 0) {
+        const suggestionMatches = suggestions
+          .filter(suggestion => 
+            suggestion.toLowerCase().includes(q.toLowerCase())
+          )
+          .map(suggestion => ({
+            name: suggestion,
+            displayName: suggestion,
+            lat: 24.8607 + (Math.random() - 0.5) * 0.1, // Random coords around Karachi
+            lng: 67.0011 + (Math.random() - 0.5) * 0.1,
+            type: "landmark" as const,
+            icon: <MapPin className="w-4 h-4" />
+          }));
+        matchedResults = suggestionMatches;
+      } else {
+        // Default behavior: search Karachi areas database
+        matchedResults = KARACHI_AREAS.filter(area => 
+          area.name.toLowerCase().includes(q.toLowerCase()) ||
+          area.displayName.toLowerCase().includes(q.toLowerCase())
+        );
+      }
       
       // Then search OpenStreetMap for more specific addresses
       let apiResults: LocationResult[] = [];
@@ -124,8 +144,8 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value }:
         console.log('API search failed, using local database only');
       }
       
-      // Combine results, prioritizing Karachi areas
-      const combinedResults = [...karachiMatches, ...apiResults];
+      // Combine results, prioritizing local results
+      const combinedResults = [...matchedResults, ...apiResults];
       setResults(combinedResults);
       setIsOpen(combinedResults.length > 0);
       setHighlightedIndex(-1);

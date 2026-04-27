@@ -165,10 +165,15 @@ const QuickRoutes = () => {
                     <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                       {route.name}
                     </h4>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>{route.origin}</span>
-                      <ArrowRight className="w-3 h-3" />
-                      <span>{route.destination}</span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="text-xs font-medium text-blue-600">From:</span>
+                        <span>{route.origin}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="text-xs font-medium text-green-600">To:</span>
+                        <span>{route.destination}</span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                       <Clock className="w-3 h-3" />
