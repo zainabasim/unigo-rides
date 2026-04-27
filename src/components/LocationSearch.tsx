@@ -283,7 +283,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/70" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white" />
         <input
           type="text"
           value={query}
@@ -298,7 +298,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
               onClick={() => { setQuery(""); setResults([]); setIsOpen(false); }}
               className="p-1.5 hover:bg-primary/20 rounded-lg transition-colors border border-primary/30"
             >
-              <X className="w-4 h-4 text-primary/70 hover:text-primary" />
+              <X className="w-4 h-4 text-white hover:text-primary" />
             </button>
           )}
           <button
@@ -307,7 +307,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
             className="p-1.5 hover:bg-primary/20 rounded-lg transition-colors border border-primary/30 disabled:opacity-50"
             title="Use current location"
           >
-            <Navigation className={`w-4 h-4 ${locationLoading ? 'animate-pulse text-primary' : 'text-primary/70 hover:text-primary'}`} />
+            <Navigation className={`w-4 h-4 ${locationLoading ? 'animate-pulse text-primary' : 'text-white hover:text-primary'}`} />
           </button>
         </div>
       </div>
@@ -342,7 +342,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
                   }`}
                 >
                   <div className={`shrink-0 mt-0.5 ${
-                    isKarachiArea ? 'text-primary' : 'text-primary/80'
+                    isKarachiArea ? 'text-primary' : 'text-white'
                   }`}>
                     {icon}
                   </div>
@@ -372,7 +372,7 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
           {results.length === 0 && !loading && (
             <div className="p-4 text-center text-white">
               <div className="text-sm text-gray-400 mb-2">
-                <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <MapPin className="w-8 h-8 mx-auto mb-2 text-white opacity-50" />
                 <p className="text-sm text-gray-400">No locations found</p>
               </div>
               <p className="text-xs text-gray-400">
