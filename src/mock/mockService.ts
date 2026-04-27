@@ -37,76 +37,96 @@ export interface MockSupabaseClient {
   rpc: (functionName: string, params: any) => Promise<{ data: any; error: any }>;
 }
 
-// localStorage keys
+// localStorage keys (session only - other data is shared globally)
 const SESSION_KEY = "mock_session";
-const USERS_KEY = "mock_users";
-const PROFILES_KEY = "mock_profiles";
-const RIDES_KEY = "mock_rides";
-const BOOKINGS_KEY = "mock_bookings";
 
-// Initialize localStorage with mock data
-const initializeLocalStorage = () => {
-  if (!localStorage.getItem(USERS_KEY)) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(mockUsers));
+// Global shared storage (simulates database)
+const getSharedStorage = () => {
+  const storageKey = "unigo_shared_data";
+  let sharedData = JSON.parse(localStorage.getItem(storageKey) || "{}");
+  
+  // Initialize shared data if not exists
+  if (!sharedData.users) {
+    sharedData.users = mockUsers;
   }
-  if (!localStorage.getItem(PROFILES_KEY)) {
+  if (!sharedData.profiles) {
     // Create profiles for existing users
-    const profiles = mockUsers.map(user => ({
+    sharedData.profiles = mockUsers.map(user => ({
       id: user.id,
       user_id: user.id,
-      full_name: user.full_name,
-      department: "Computer Science",
-      designation: "Faculty Member",
-      green_score: Math.floor(Math.random() * 100),
+      full_name: user.full_name || user.email,
+      email: user.email,
+      department: "Computer Engineering",
+      phone: user.phone || "",
+      whatsapp: user.whatsapp || "",
+      avatar_url: "",
+      is_driver: user.user_role === "driver",
+      rating: 4.5 + Math.random() * 0.5,
       total_rides: Math.floor(Math.random() * 50),
       created_at: user.created_at
     }));
-    localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
   }
-  if (!localStorage.getItem(RIDES_KEY)) {
-    localStorage.setItem(RIDES_KEY, JSON.stringify(mockRides));
+  if (!sharedData.rides) {
+    sharedData.rides = mockRides;
   }
-  if (!localStorage.getItem(BOOKINGS_KEY)) {
-    localStorage.setItem(BOOKINGS_KEY, JSON.stringify([]));
+  if (!sharedData.bookings) {
+    sharedData.bookings = [];
   }
+  
+  localStorage.setItem(storageKey, JSON.stringify(sharedData));
+  return sharedData;
 };
 
-// Get data from localStorage
+// Save shared storage
+const saveSharedStorage = (sharedData: any) => {
+  const storageKey = "unigo_shared_data";
+  localStorage.setItem(storageKey, JSON.stringify(sharedData));
+};
+
+// Get data from shared storage
 const getUsers = (): User[] => {
-  initializeLocalStorage();
-  return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+  const sharedData = getSharedStorage();
+  return sharedData.users;
 };
 
 const getProfiles = (): any[] => {
-  initializeLocalStorage();
-  return JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]");
+  const sharedData = getSharedStorage();
+  return sharedData.profiles;
 };
 
 const getRides = (): Ride[] => {
-  initializeLocalStorage();
-  return JSON.parse(localStorage.getItem(RIDES_KEY) || "[]");
+  const sharedData = getSharedStorage();
+  return sharedData.rides;
 };
 
 const getBookings = (): any[] => {
-  initializeLocalStorage();
-  return JSON.parse(localStorage.getItem(BOOKINGS_KEY) || "[]");
+  const sharedData = getSharedStorage();
+  return sharedData.bookings;
 };
 
-// Save data to localStorage
+// Save data to shared storage
 const saveUsers = (users: User[]) => {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  const sharedData = getSharedStorage();
+  sharedData.users = users;
+  saveSharedStorage(sharedData);
 };
 
 const saveProfiles = (profiles: any[]) => {
-  localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+  const sharedData = getSharedStorage();
+  sharedData.profiles = profiles;
+  saveSharedStorage(sharedData);
 };
 
 const saveRides = (rides: Ride[]) => {
-  localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
+  const sharedData = getSharedStorage();
+  sharedData.rides = rides;
+  saveSharedStorage(sharedData);
 };
 
 const saveBookings = (bookings: any[]) => {
-  localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+  const sharedData = getSharedStorage();
+  sharedData.bookings = bookings;
+  saveSharedStorage(sharedData);
 };
 
 // Mock auth functions
@@ -180,6 +200,8 @@ const signInWithPassword = async ({ email, password }: { email: string; password
         email,
         full_name: formattedName,
         phone: "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0'),
+        whatsapp: "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0'),
+        user_role: "passenger",
         password: "any", // Accept any password for testing
         created_at: new Date().toISOString(),
       };
@@ -256,10 +278,10 @@ const from = (table: string) => {
         const profiles = getProfiles();
         const profile = profiles.find(p => p[column] === value);
         return {
-          order: () => ({ data: profile ? [profile] : [], error: null }),
-          single: () => ({ data: profile || null, error: null }),
+          order: () => Promise.resolve({ data: profile ? [profile] : [], error: null }),
+          single: () => Promise.resolve({ data: profile || null, error: null }),
           limit: (count: number) => ({
-            order: () => ({ data: profile ? [profile] : [], error: null })
+            order: () => Promise.resolve({ data: profile ? [profile] : [], error: null })
           })
         };
       }
@@ -268,10 +290,10 @@ const from = (table: string) => {
         const rides = getRides();
         const filteredRides = rides.filter(r => r[column as keyof Ride] === value);
         return {
-          order: () => ({ data: filteredRides, error: null }),
-          single: () => ({ data: filteredRides[0] || null, error: null }),
+          order: () => Promise.resolve({ data: filteredRides, error: null }),
+          single: () => Promise.resolve({ data: filteredRides[0] || null, error: null }),
           limit: (count: number) => ({
-            order: () => ({ data: filteredRides.slice(0, count), error: null })
+            order: () => Promise.resolve({ data: filteredRides.slice(0, count), error: null })
           })
         };
       }
@@ -280,19 +302,19 @@ const from = (table: string) => {
         const bookings = getBookings();
         const filteredBookings = bookings.filter((b: any) => b[column] === value);
         return {
-          order: () => ({ data: filteredBookings, error: null }),
-          single: () => ({ data: filteredBookings[0] || null, error: null }),
+          order: () => Promise.resolve({ data: filteredBookings, error: null }),
+          single: () => Promise.resolve({ data: filteredBookings[0] || null, error: null }),
           limit: (count: number) => ({
-            order: () => ({ data: filteredBookings.slice(0, count), error: null })
+            order: () => Promise.resolve({ data: filteredBookings.slice(0, count), error: null })
           })
         };
       }
 
       return {
-        order: () => ({ data: [], error: null }),
-        single: () => ({ data: null, error: null }),
+        order: () => Promise.resolve({ data: [], error: null }),
+        single: () => Promise.resolve({ data: null, error: null }),
         limit: (count: number) => ({
-          order: () => ({ data: [], error: null })
+          order: () => Promise.resolve({ data: [], error: null })
         })
       };
     };
@@ -431,10 +453,10 @@ const rpc = (functionName: string, params: any) => {
       saveRides(rides);
     }
 
-    return { data: true, error: null };
+    return Promise.resolve({ data: true, error: null });
   }
 
-  return { data: null, error: { message: "Function not found" } };
+  return Promise.resolve({ data: null, error: { message: "Function not found" } });
 };
 
 // Auth state change listener
