@@ -109,14 +109,35 @@ const LocationSearch = ({ placeholder = "Search location...", onSelect, value, s
           .filter(suggestion => 
             suggestion.toLowerCase().includes(q.toLowerCase())
           )
-          .map(suggestion => ({
-            name: suggestion,
-            displayName: suggestion,
-            lat: 24.8607 + (Math.random() - 0.5) * 0.1, // Random coords around Karachi
-            lng: 67.0011 + (Math.random() - 0.5) * 0.1,
-            type: "landmark" as const,
-            icon: <MapPin className="w-4 h-4" />
-          }));
+          .map(suggestion => {
+            // Use specific coordinates for NEDUET landmarks
+            let lat = 24.8607 + (Math.random() - 0.5) * 0.1;
+            let lng = 67.0011 + (Math.random() - 0.5) * 0.1;
+            
+            // Specific coordinates for common NEDUET locations
+            if (suggestion.toLowerCase().includes('ned') || suggestion.toLowerCase().includes('main gate')) {
+              lat = 24.9340; // NED University coordinates
+              lng = 67.1113;
+            } else if (suggestion.toLowerCase().includes('maskan')) {
+              lat = 24.9360;
+              lng = 67.1090;
+            } else if (suggestion.toLowerCase().includes('safari')) {
+              lat = 24.9380;
+              lng = 67.1080;
+            } else if (suggestion.toLowerCase().includes('millennium')) {
+              lat = 24.9320;
+              lng = 67.1120;
+            }
+            
+            return {
+              name: suggestion,
+              displayName: suggestion,
+              lat,
+              lng,
+              type: "landmark" as const,
+              icon: <MapPin className="w-4 h-4" />
+            };
+          });
         matchedResults = suggestionMatches;
       } else {
         // Default behavior: search Karachi areas database

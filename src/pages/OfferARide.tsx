@@ -50,10 +50,16 @@ const OfferARide = () => {
   };
 
   const calculateSuggestedPrice = () => {
-    if (!pickupCoords || !destinationCoords) return;
+    console.log('calculateSuggestedPrice called', { pickupCoords, destinationCoords, vehicleType });
+    
+    if (!pickupCoords || !destinationCoords) {
+      console.log('Missing coordinates:', { pickupCoords, destinationCoords });
+      return;
+    }
     
     // Calculate actual distance between pickup and destination
     const distance = calculateDistance(pickupCoords, destinationCoords);
+    console.log('Calculated distance:', distance);
     
     const pricing = calculateRidePrice(
       distance,
@@ -61,7 +67,11 @@ const OfferARide = () => {
       'petrol' // Default fuel type
     );
     
-    setSuggestedPrice(formatPrice(pricing.suggestedPrice));
+    console.log('Calculated pricing:', pricing);
+    const formattedPrice = formatPrice(pricing.suggestedPrice);
+    console.log('Formatted price:', formattedPrice);
+    
+    setSuggestedPrice(formattedPrice);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,8 +210,10 @@ const OfferARide = () => {
               placeholder="Enter pickup location..."
               value={pickupLocation}
               onSelect={(location) => {
+                console.log('Pickup location selected:', location);
                 setPickupLocation(location.name);
                 setPickupCoords({ lat: location.lat, lng: location.lng });
+                console.log('Pickup coords set:', { lat: location.lat, lng: location.lng });
               }}
               suggestions={ALL_LOCATIONS}
             />
@@ -225,19 +237,40 @@ const OfferARide = () => {
               placeholder="Enter destination..."
               value={destination}
               onSelect={(location) => {
+                console.log('Destination location selected:', location);
                 setDestination(location.name);
                 setDestinationCoords({ lat: location.lat, lng: location.lng });
+                console.log('Destination coords set:', { lat: location.lat, lng: location.lng });
               }}
               suggestions={ALL_LOCATIONS}
             />
           </div>
 
-          {pickupCoords && destinationCoords && (
+          {/* Pickup Location Map */}
+          {pickupCoords && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Route Preview</label>
+              <label className="text-sm font-medium text-white">Pickup Location Map (Click to set pickup)</label>
               <MapPicker
                 initialLocation={pickupCoords}
-                onLocationSelect={(location) => setPickupCoords(location)}
+                onLocationSelect={(location) => {
+                  console.log('Pickup location updated from map:', location);
+                  setPickupCoords(location);
+                }}
+                height="200px"
+              />
+            </div>
+          )}
+
+          {/* Destination Location Map */}
+          {destinationCoords && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Destination Location Map (Click to set destination)</label>
+              <MapPicker
+                initialLocation={destinationCoords}
+                onLocationSelect={(location) => {
+                  console.log('Destination location updated from map:', location);
+                  setDestinationCoords(location);
+                }}
                 height="200px"
               />
             </div>

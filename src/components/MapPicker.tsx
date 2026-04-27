@@ -83,6 +83,21 @@ const MapPicker = ({ initialLocation, onLocationSelect, height = "300px" }: MapP
       onLocationSelect(newLocation);
     });
 
+    // Add click-to-select functionality
+    mapInstance.current.on('click', (e: any) => {
+      const clickedLat = e.latlng.lat;
+      const clickedLng = e.latlng.lng;
+      const newLocation = { lat: clickedLat, lng: clickedLng };
+      
+      // Update marker position
+      if (markerRef.current) {
+        markerRef.current.setLatLng([clickedLat, clickedLng]);
+      }
+      
+      setSelectedLocation(newLocation);
+      onLocationSelect(newLocation);
+    });
+
     return () => {
       mapInstance.current?.remove();
       mapInstance.current = null;
