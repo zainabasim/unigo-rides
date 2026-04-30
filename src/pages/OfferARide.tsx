@@ -24,6 +24,12 @@ const OfferARide = () => {
   const [departureTime, setDepartureTime] = useState("");
   const [seats, setSeats] = useState(2);
   const [price, setPrice] = useState("");
+  
+  // Set reasonable default price based on vehicle type
+  useEffect(() => {
+    const defaultPrice = vehicleType === "car" ? "150" : "80";
+    setPrice(defaultPrice);
+  }, [vehicleType]);
   const [suggestedPrice, setSuggestedPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -144,8 +150,8 @@ const OfferARide = () => {
                 }}
                 className={`flex-1 h-12 rounded-xl border-2 font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
                   vehicleType === "car"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:border-primary/50"
+                    ? "border-primary bg-primary text-white"
+                    : "border-border bg-background text-slate-700 hover:border-primary/50"
                 }`}
               >
                 <Car className="w-4 h-4" />
@@ -159,8 +165,8 @@ const OfferARide = () => {
                 }}
                 className={`flex-1 h-12 rounded-xl border-2 font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
                   vehicleType === "bike"
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:border-primary/50"
+                    ? "border-primary bg-primary text-white"
+                    : "border-border bg-background text-slate-700 hover:border-primary/50"
                 }`}
               >
                 <Bike className="w-4 h-4" />
@@ -174,8 +180,7 @@ const OfferARide = () => {
             placeholder={vehicleType === "car" ? "Toyota Corolla 2020" : "Honda CD70"}
             value={vehicleModel}
             onChange={(e) => setVehicleModel(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
-            style={{ color: 'black !important' }}
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
           <input
@@ -183,8 +188,7 @@ const OfferARide = () => {
             placeholder="ABC-123"
             value={plateNumber}
             onChange={(e) => setPlateNumber(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
-            style={{ color: 'black !important' }}
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
 
@@ -302,8 +306,7 @@ const OfferARide = () => {
             placeholder="8:00 AM"
             value={departureTime}
             onChange={(e) => setDepartureTime(e.target.value)}
-            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
-            style={{ color: 'black !important' }}
+            className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-ring"
             required
           />
 
@@ -313,7 +316,7 @@ const OfferARide = () => {
               placeholder="Set your fare for per seat"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-ring"
               style={{ color: 'black !important' }}
               min="0"
               step="0.5"
@@ -396,7 +399,7 @@ const OfferARide = () => {
                     type="time"
                     value={departureTime}
                     onChange={(e) => setDepartureTime(e.target.value)}
-                    className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-ring"
                     required
                   />
                 </div>
