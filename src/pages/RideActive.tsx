@@ -19,7 +19,7 @@ interface RideData {
   driver_name: string;
   driver_phone: string;
   driver_whatsapp: string;
-  vehicle_type: 'car' | 'bike';
+  vehicle_type: 'CAR' | 'BIKE';
   vehicle_model: string;
   plate_number: string;
   pickup_location: string;
@@ -28,7 +28,7 @@ interface RideData {
   price: number;
   seats: number;
   filled_seats: number;
-  status: 'waiting' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
+  status: 'WAITING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
   partners: RidePartner[];
   created_at: string;
 }
@@ -44,8 +44,39 @@ export default function RideActive() {
   useEffect(() => {
     const loadRide = async () => {
       try {
-        // Fetch from database
-        const rideData = await rideService.getRideById(rideId);
+        // Check localStorage first for temp rides
+        const storedRide = localStorage.getItem('activeRide');
+        let rideData = null;
+        
+        if (storedRide) {
+          const parsedRide = JSON.parse(storedRide);
+          
+          // If this is a temp ride ID, try to fetch from database
+          if (parsedRide.id.startsWith('temp_')) {
+            console.log('Loading temp ride, checking database...');
+            try {
+              const dbRide = await rideService.getRideById(rideId);
+              if (dbRide) {
+                // Update localStorage with real ride data
+                localStorage.setItem('activeRide', JSON.stringify({
+                  ...parsedRide,
+                  id: dbRide.id,
+                  driver: dbRide.driver
+                }));
+                rideData = dbRide;
+              } else {
+                rideData = parsedRide;
+              }
+            } catch (dbError) {
+              console.error('Database error, using temp data:', dbError);
+              rideData = parsedRide;
+            }
+          } else {
+            rideData = await rideService.getRideById(rideId);
+          }
+        } else {
+          rideData = await rideService.getRideById(rideId);
+        }
 
         if (!rideData) {
           toast.error('Ride not found');
@@ -152,7 +183,7 @@ export default function RideActive() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="text-slate-600">Loading ride details...</p>
         </div>
       </div>

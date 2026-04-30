@@ -113,17 +113,40 @@ const OfferARide = () => {
     };
 
     try {
-      const data = await rideService.createRide(rideData);
+      // Save to localStorage first for immediate response
+      const tempRideId = `temp_${Date.now()}`;
+      const tempRideData = {
+        ...rideData,
+        id: tempRideId,
+        created_at: new Date().toISOString()
+      };
+      
+      localStorage.setItem('activeRide', JSON.stringify(tempRideData));
+      
+      // Redirect immediately to active ride page
+      navigate(`/ride-active/${tempRideId}`);
+      
+      // Then save to database in background
+      rideService.createRide(rideData)
+        .then(data => {
+          // Update localStorage with real ride ID
+          localStorage.setItem('activeRide', JSON.stringify({
+            ...tempRideData,
+            id: data.id
+          }));
+          
+          // Update the URL to use real ride ID
+          window.history.replaceState(null, '', `/ride-active/${data.id}`);
+        })
+        .catch(error => {
+          console.error('Database error:', error);
+          toast.error("Failed to save ride to database: " + (error as Error).message);
+          // Keep the ride in localStorage with temp ID for now
+        });
       
       setLoading(false);
-      toast.success("Ride offered successfully with location data!");
+      toast.success("Ride offered successfully!");
       
-      // Redirect to active ride page instead of homepage
-      if (data?.id) {
-        navigate(`/ride-active/${data.id}`);
-      } else {
-        navigate("/home");
-      }
     } catch (error) {
       setLoading(false);
       toast.error("Failed to offer ride: " + (error as Error).message);
