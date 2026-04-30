@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Home, MapPin, Clock, ArrowRight, Star, Plus } from "lucide-react";
 import { calculateDistance, calculateRidePrice, formatPrice } from "@/utils/pricing";
+import { rideService } from "@/lib/database";
 
 interface QuickRoute {
   id: string;
@@ -49,25 +49,13 @@ const QuickRoutes = () => {
   const { data: availableRides = [] } = useQuery({
     queryKey: ["quick-route-rides"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rides")
-        .select("*, profiles!rides_driver_id_fkey(full_name, department)")
-        .eq("is_active", true)
-        .gt("available_seats", 0)
-        .in("status", ["waiting"]) // Only show waiting rides
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      
-      // Filter out expired rides (15 minutes past departure time)
-      const currentTime = new Date();
-      const filteredRides = (data || []).filter(ride => {
-        const departureTime = new Date(ride.departure_time);
-        const fifteenMinutesAfter = new Date(departureTime.getTime() + 15 * 60 * 1000);
-        return currentTime <= fifteenMinutesAfter;
-      });
-      
-      return filteredRides;
+      try {
+        const rides = await rideService.getAvailableRides();
+        return rides;
+      } catch (error) {
+        console.error('Error fetching rides:', error);
+        throw error;
+      }
     },
   });
 

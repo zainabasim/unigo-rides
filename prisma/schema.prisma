@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  full_name   String
+  phone       String
+  whatsapp    String
+  password    String
+  user_role   UserRole @default(DRIVER)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  department  String?
+  avatar      String?
+
+  // Relationships
+  rides       Ride[]
+  bookings    Booking[]
+  profile     Profile?
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  user_id     String   @unique
+  full_name   String
+  department  String?
+  phone_number String?
+  avatar      String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relationships
+  user        User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Ride {
+  id              String      @id @default(cuid())
+  driver_id       String
+  vehicle_type    VehicleType
+  vehicle_model   String
+  plate_number    String
+  origin          String
+  destination     String
+  origin_lat      Float?
+  origin_lng      Float?
+  destination_lat Float?
+  destination_lng Float?
+  departure_time  DateTime
+  total_seats     Int
+  available_seats Int
+  price           Float
+  status          RideStatus  @default(WAITING)
+  is_active       Boolean     @default(true)
+  is_recurring    Boolean     @default(false)
+  recurring_days  String[]    @default([])
+  recurring_time  String?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+
+  // Relationships
+  driver          User @relation(fields: [driver_id], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+
+  @@map("rides")
+}
+
+model Booking {
+  id          String      @id @default(cuid())
+  ride_id     String
+  passenger_id String
+  status      BookingStatus @default(PENDING)
+  pickup_time DateTime?
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+
+  // Relationships
+  ride        Ride @relation(fields: [ride_id], references: [id], onDelete: Cascade)
+  passenger   User @relation(fields: [passenger_id], references: [id], onDelete: Cascade)
+
+  @@unique([ride_id, passenger_id])
+  @@map("bookings")
+}
+
+// Enums
+enum UserRole {
+  DRIVER
+  PASSENGER
+}
+
+enum VehicleType {
+  CAR
+  BIKE
+}
+
+enum RideStatus {
+  WAITING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}

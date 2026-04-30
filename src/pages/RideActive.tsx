@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Car, Bike, Phone, MessageCircle, Users, Clock, MapPin, X, Play, Trash2 } from 'lucide-react';
-import { mockSupabase } from '../mock/mockService';
+import { rideService } from '../lib/database';
+import { RideStatus } from '@prisma/client';
 
 interface RidePartner {
   id: string;
@@ -43,40 +44,13 @@ export default function RideActive() {
   useEffect(() => {
     const loadRide = async () => {
       try {
-        // Check localStorage first
-        const storedRide = localStorage.getItem('activeRide');
-        if (storedRide) {
-          const rideData = JSON.parse(storedRide);
-          if (rideData.id === rideId) {
-            setRide(rideData);
-          }
-        }
+        // Fetch from database
+        const rideData = await rideService.getRideById(rideId);
 
-        // Also fetch from database
-        const { data: rideData, error } = await mockSupabase
-          .from('rides')
-          .select('*')
-          .eq('id', rideId)
-          .single();
-
-        if (error || !rideData) {
+        if (!rideData) {
           toast.error('Ride not found');
           navigate('/');
           return;
-        }
-
-        // Check if ride is expired (15 minutes past departure time)
-        const departureTime = new Date(rideData.departure_time);
-        const fifteenMinutesAfter = new Date(departureTime.getTime() + 15 * 60 * 1000);
-        
-        if (currentTime > fifteenMinutesAfter && rideData.status === 'waiting') {
-          // Update ride status to expired
-          await mockSupabase
-            .from('rides')
-            .update({ status: 'expired' })
-            .eq('id', rideId);
-          
-          rideData.status = 'expired';
         }
 
         setRide(rideData);
@@ -114,14 +88,8 @@ export default function RideActive() {
     if (!ride) return;
 
     try {
-      const { error } = await mockSupabase
-        .from('rides')
-        .update({ status: 'in_progress' })
-        .eq('id', ride.id);
-
-      if (error) throw error;
-
-      setRide({ ...ride, status: 'in_progress' });
+      const updatedRide = await rideService.updateRideStatus(ride.id, RideStatus.IN_PROGRESS);
+      setRide(updatedRide);
       toast.success('Ride started! Partners have been notified.');
     } catch (error) {
       console.error('Error starting ride:', error);
@@ -134,14 +102,8 @@ export default function RideActive() {
 
     if (confirm('Are you sure you want to cancel this ride? This action cannot be undone.')) {
       try {
-        const { error } = await mockSupabase
-          .from('rides')
-          .update({ status: 'cancelled' })
-          .eq('id', ride.id);
-
-        if (error) throw error;
-
-        setRide({ ...ride, status: 'cancelled' });
+        const updatedRide = await rideService.updateRideStatus(ride.id, RideStatus.CANCELLED);
+        setRide(updatedRide);
         localStorage.removeItem('activeRide');
         toast.success('Ride cancelled successfully');
         

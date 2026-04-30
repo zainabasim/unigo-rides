@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { ChevronDown, Car, Bike, ArrowUpDown, MapPin } from "lucide-react";
+import { Car, Bike, ArrowUpDown, MapPin } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import LocationSearch from "@/components/LocationSearch";
 import MapPicker from "@/components/MapPicker";
-import { calculateDistance, calculateRidePrice, formatPrice, FUEL_PRICES } from "@/utils/pricing";
 import { ALL_LOCATIONS } from "@/constants/landmarks";
+import { calculateDistance, calculateRidePrice, formatPrice } from "@/utils/pricing";
+import { rideService } from "@/lib/database";
+import { VehicleType } from "@prisma/client";
 
 const OfferARide = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [vehicleType, setVehicleType] = useState<"car" | "bike">("car");
+  const [vehicleType, setVehicleType] = useState<VehicleType>("car");
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [pickupLocation, setPickupLocation] = useState("");
@@ -98,30 +99,34 @@ const OfferARide = () => {
       plate_number: plateNumber,
       origin: pickupLocation,
       destination: destination,
-      departure_time: departureTime,
+      origin_lat: pickupCoords?.lat,
+      origin_lng: pickupCoords?.lng,
+      destination_lat: destinationCoords?.lat,
+      destination_lng: destinationCoords?.lng,
+      departure_time: new Date(departureTime),
       total_seats: seats,
       available_seats: seats,
       price: parseFloat(price) || 0,
-      is_active: true, // Mark ride as active immediately
       is_recurring: isRecurring,
       recurring_days: recurringDays,
       recurring_time: departureTime,
     };
 
-    const { data, error } = await supabase.from("rides").insert(rideData).select().single();
-
-    setLoading(false);
-
-    if (error) {
-      toast.error("Failed to offer ride: " + error.message);
-    } else {
+    try {
+      const data = await rideService.createRide(rideData);
+      
+      setLoading(false);
       toast.success("Ride offered successfully with location data!");
+      
       // Redirect to active ride page instead of homepage
       if (data?.id) {
         navigate(`/ride-active/${data.id}`);
       } else {
         navigate("/home");
       }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Failed to offer ride: " + (error as Error).message);
     }
   };
 

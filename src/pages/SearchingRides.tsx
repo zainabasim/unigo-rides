@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Car, Search, MapPin, Clock, Users } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 import PhoneContact from "@/components/PhoneContact";
+import { rideService } from "@/lib/database";
 
 interface SearchingRidesProps {
   pickupLocation?: string;
@@ -24,25 +24,13 @@ const SearchingRides = ({ pickupLocation = "Your Location", destination = "NED U
   const { data: rides = [], isLoading } = useQuery({
     queryKey: ["rides", "search"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rides")
-        .select("*, profiles!rides_driver_id_fkey(full_name, department, phone_number)")
-        .eq("is_active", true)
-        .gt("available_seats", 0)
-        .in("status", ["waiting"]) // Only show waiting rides
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      
-      // Filter out expired rides (15 minutes past departure time)
-      const currentTime = new Date();
-      const filteredRides = (data || []).filter(ride => {
-        const departureTime = new Date(ride.departure_time);
-        const fifteenMinutesAfter = new Date(departureTime.getTime() + 15 * 60 * 1000);
-        return currentTime <= fifteenMinutesAfter;
-      });
-      
-      return filteredRides;
+      try {
+        const rides = await rideService.getAvailableRides();
+        return rides;
+      } catch (error) {
+        console.error('Error fetching rides:', error);
+        throw error;
+      }
     },
   });
 
