@@ -11,13 +11,16 @@ const PhoneContact = ({ phoneNumber, userName, compact = false }: PhoneContactPr
   const [showOptions, setShowOptions] = useState(false);
 
   const handleWhatsAppClick = () => {
-    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`;
+    const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(`Hi, I'm your UniGo partner. I'm at your pickup location, are you nearby?`);
+    const whatsappUrl = `https://wa.me/92${cleanNumber.substring(2)}?text=${message}`;
     window.open(whatsappUrl, '_blank');
     setShowOptions(false);
   };
 
   const handleCallClick = () => {
-    window.location.href = `tel:${phoneNumber}`;
+    const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+    window.location.href = `tel:+92${cleanNumber.substring(2)}`;
     setShowOptions(false);
   };
 

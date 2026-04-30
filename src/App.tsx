@@ -17,6 +17,7 @@ import DriverDashboard from "./pages/DriverDashboard";
 import RidePartner from "./pages/RidePartner";
 import ManageRide from "./pages/ManageRide";
 import Chat from "./pages/Chat";
+import RideActive from "./pages/RideActive";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
             <Route path="/ride-partner/:bookingId" element={<ProtectedRoute><RidePartner /></ProtectedRoute>} />
             <Route path="/manage-ride/:rideId" element={<ProtectedRoute><ManageRide /></ProtectedRoute>} />
+            <Route path="/ride-active/:rideId" element={<ProtectedRoute><RideActive /></ProtectedRoute>} />
             <Route path="/chat/:rideId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

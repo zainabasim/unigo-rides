@@ -54,10 +54,20 @@ const QuickRoutes = () => {
         .select("*, profiles!rides_driver_id_fkey(full_name, department)")
         .eq("is_active", true)
         .gt("available_seats", 0)
+        .in("status", ["waiting"]) // Only show waiting rides
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Filter out expired rides (15 minutes past departure time)
+      const currentTime = new Date();
+      const filteredRides = (data || []).filter(ride => {
+        const departureTime = new Date(ride.departure_time);
+        const fifteenMinutesAfter = new Date(departureTime.getTime() + 15 * 60 * 1000);
+        return currentTime <= fifteenMinutesAfter;
+      });
+      
+      return filteredRides;
     },
   });
 

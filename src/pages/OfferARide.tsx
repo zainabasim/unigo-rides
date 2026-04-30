@@ -108,7 +108,7 @@ const OfferARide = () => {
       recurring_time: departureTime,
     };
 
-    const { error } = await supabase.from("rides").insert(rideData);
+    const { data, error } = await supabase.from("rides").insert(rideData).select().single();
 
     setLoading(false);
 
@@ -116,7 +116,12 @@ const OfferARide = () => {
       toast.error("Failed to offer ride: " + error.message);
     } else {
       toast.success("Ride offered successfully with location data!");
-      navigate("/home");
+      // Redirect to active ride page instead of homepage
+      if (data?.id) {
+        navigate(`/ride-active/${data.id}`);
+      } else {
+        navigate("/home");
+      }
     }
   };
 

@@ -195,15 +195,18 @@ const signInWithPassword = async ({ email, password }: { email: string; password
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
       
+      const phoneNumber = "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0');
+      const whatsappNumber = "+92" + phoneNumber.substring(2);
+      
       user = {
         id: Date.now().toString(),
         email,
         full_name: formattedName,
-        phone: "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0'),
-        whatsapp: "03" + Math.floor(Math.random() * 100000000).toString().padStart(9, '0'),
-        user_role: "passenger",
+        phone: phoneNumber,
+        whatsapp: whatsappNumber,
         password: "any", // Accept any password for testing
         created_at: new Date().toISOString(),
+        user_role: "driver"
       };
       
       users.push(user);
