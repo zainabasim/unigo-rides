@@ -30,30 +30,36 @@ const Login = () => {
 
     setLoading(true);
 
-    // Mock authentication with predefined credentials
-    const mockCredentials = [
-      { email: "ali.khan@cloud.neduet.edu.pk", password: "password123", name: "Ali Khan" },
-      { email: "sara.ahmed@cloud.neduet.edu.pk", password: "password123", name: "Sara Ahmed" },
-      { email: "umar.farooq@cloud.neduet.edu.pk", password: "password123", name: "Umar Farooq" },
-      { email: "zainab@cloud.neduet.edu.pk", password: "password123", name: "Zainab Asim" }
-    ];
+    // Hardcoded demo credentials for smooth demo
+    const demoEmail = "zainab@cloud.neduet.edu.pk";
+    const demoPassword = "12345678";
 
-    const user = mockCredentials.find(
-      cred => cred.email === normalizedEmail && cred.password === password
-    );
-
-    if (user) {
-      // Mock successful login
-      toast.success(`Welcome back, ${user.name}!`);
-      // Redirect to home page after successful login
+    if (normalizedEmail === demoEmail && password === demoPassword) {
+      // Set user state in localStorage
+      const userState = {
+        id: "4",
+        email: demoEmail,
+        full_name: "Zainab Asim",
+        user_role: "driver",
+        phone: "03456789012",
+        whatsapp: "03456789012"
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userState));
+      
+      // Show success toast
+      toast.success(`Welcome back, Zainab Asim!`);
+      
+      // Simulate loading state for UI feedback
       setTimeout(() => {
-        navigate("/home", { replace: true });
-      }, 1000);
+        // Redirect to offer-a-ride page
+        navigate("/offer-a-ride", { replace: true });
+      }, 1500);
     } else {
+      // Only show error toast for incorrect credentials
       toast.error("Invalid credentials. Please check your email and password.");
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
