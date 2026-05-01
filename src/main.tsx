@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import TestComponent from "./TestComponent.tsx";
 import "./index.css";
 
 // Add error boundary
@@ -39,6 +40,7 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   console.error('Root element not found!');
 } else {
+  console.log('Main.tsx: Root element found, rendering app');
   createRoot(rootElement).render(
     <ErrorBoundary>
       <App />

@@ -8,6 +8,7 @@ import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 
 const Login = () => {
+  console.log('Login.tsx: Rendering Login component');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +50,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col" style={{ backgroundColor: 'white' }}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <img src={unigoIcon} alt="UniGo" className="w-8 h-8 object-contain" />
@@ -64,6 +65,9 @@ const Login = () => {
         </div>
         <h1 className="text-2xl font-bold text-foreground">UniGo</h1>
         <p className="text-muted-foreground mb-8 text-sm">Faculty Login</p>
+        <div style={{ backgroundColor: 'red', padding: '20px', margin: '20px' }}>
+          TEST: If you can see this red box, the page is rendering!
+        </div>
 
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-4">
           <div>

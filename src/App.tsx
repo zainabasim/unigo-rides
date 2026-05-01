@@ -24,34 +24,37 @@ import ProtectedRoute from "./components/ProtectedRoute";
 const queryClient = new QueryClient();
 
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/need-a-ride" element={<ProtectedRoute><NeedARide /></ProtectedRoute>} />
-            <Route path="/offer-a-ride" element={<ProtectedRoute><OfferARide /></ProtectedRoute>} />
-            <Route path="/searching-rides" element={<ProtectedRoute><SearchingRides /></ProtectedRoute>} />
-            <Route path="/ride-confirmed/:bookingId" element={<ProtectedRoute><RideConfirmed /></ProtectedRoute>} />
-            <Route path="/my-rides" element={<ProtectedRoute><MyRides /></ProtectedRoute>} />
-            <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
-            <Route path="/ride-partner/:bookingId" element={<ProtectedRoute><RidePartner /></ProtectedRoute>} />
-            <Route path="/manage-ride/:rideId" element={<ProtectedRoute><ManageRide /></ProtectedRoute>} />
-            <Route path="/ride-active/:rideId" element={<ProtectedRoute><RideActive /></ProtectedRoute>} />
-            <Route path="/chat/:rideId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log('App.tsx: Rendering App component');
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/need-a-ride" element={<ProtectedRoute><NeedARide /></ProtectedRoute>} />
+              <Route path="/offer-a-ride" element={<ProtectedRoute><OfferARide /></ProtectedRoute>} />
+              <Route path="/searching-rides" element={<ProtectedRoute><SearchingRides /></ProtectedRoute>} />
+              <Route path="/ride-confirmed/:bookingId" element={<ProtectedRoute><RideConfirmed /></ProtectedRoute>} />
+              <Route path="/my-rides" element={<ProtectedRoute><MyRides /></ProtectedRoute>} />
+              <Route path="/driver-dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
+              <Route path="/ride-partner/:bookingId" element={<ProtectedRoute><RidePartner /></ProtectedRoute>} />
+              <Route path="/manage-ride/:rideId" element={<ProtectedRoute><ManageRide /></ProtectedRoute>} />
+              <Route path="/ride-active/:rideId" element={<ProtectedRoute><RideActive /></ProtectedRoute>} />
+              <Route path="/chat/:rideId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

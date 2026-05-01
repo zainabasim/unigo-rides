@@ -93,7 +93,7 @@ const OfferARide = () => {
     setLoading(true);
     
     const rideData = {
-      driver_id: user.id,
+      driver_id: user?.id,
       vehicle_type: vehicleType,
       vehicle_model: vehicleModel,
       plate_number: plateNumber,

@@ -38,8 +38,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('AuthProvider: Setting up auth state change listener');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        console.log('AuthProvider: Auth state changed', { event: _event, hasSession: !!session });
         setSession(session);
         if (session?.user) {
           void ensureProfile(session.user);
@@ -48,7 +50,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
+    console.log('AuthProvider: Getting current session');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthProvider: Got current session', { hasSession: !!session });
       setSession(session);
       if (session?.user) {
         void ensureProfile(session.user);
