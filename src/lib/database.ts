@@ -26,7 +26,7 @@ export interface CreateUserData {
   phone: string
   whatsapp: string
   password: string
-  user_role?: UserRole
+  user_role?: string
   department?: string
 }
 
@@ -109,79 +109,72 @@ export const rideService = {
   },
 
   // Get ride by ID
-  async getRideById(rideId: string) {
-    const ride = await prisma.ride.findUnique({
-      where: { id: rideId },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
-      }
-    })
-
-    // Check if ride is expired
-    if (ride && ride.status === RideStatus.WAITING) {
-      const currentTime = new Date()
-      const fifteenMinutesAfter = new Date(ride.departure_time.getTime() + 15 * 60 * 1000)
+  async getRide(rideId: string) {
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const result = await mockSupabase
+        .from('rides')
+        .select('*')
+        .eq('id', rideId)
+        .single();
       
-      if (currentTime > fifteenMinutesAfter) {
-        // Update ride status to expired
-        await prisma.ride.update({
-          where: { id: rideId },
-          data: { status: RideStatus.EXPIRED }
-        })
-        ride.status = RideStatus.EXPIRED
+      const { data, error } = result;
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Ride not found');
       }
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching ride:', error);
+      throw error;
     }
+  },
 
-    return ride
+  // Get ride by ID (alias for backward compatibility)
+  async getRideById(rideId: string) {
+    return this.getRide(rideId);
   },
 
   // Update ride status
-  async updateRideStatus(rideId: string, status: RideStatus) {
-    const updateData: any = { status }
+  async updateRideStatus(rideId: string, status: string) {
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
     
-    // If starting ride, mark as inactive in search results
-    if (status === RideStatus.IN_PROGRESS) {
-      updateData.is_active = false
-    }
-    
-    // If cancelling or completing, mark as inactive
-    if (status === RideStatus.CANCELLED || status === RideStatus.COMPLETED) {
-      updateData.is_active = false
-    }
-
-    return await prisma.ride.update({
-      where: { id: rideId },
-      data: updateData,
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
+    try {
+      const updateData: any = { ride_status: status }
+      
+      // If starting ride, mark as inactive in search results
+      if (status === 'in_progress' || status === 'IN_PROGRESS') {
+        updateData.is_active = false
       }
-    })
+      
+      // If cancelling or completing, mark as inactive
+      if (status === 'cancelled' || status === 'CANCELLED' || 
+          status === 'completed' || status === 'COMPLETED') {
+        updateData.is_active = false
+      }
+
+      const result = await mockSupabase
+        .from('rides')
+        .update(updateData)
+        .eq('id', rideId)
+        .select('*')
+        .single();
+      
+      const { data, error } = result;
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Failed to update ride status');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error updating ride status:', error);
+      throw error;
+    }
   },
 
   // Update available seats (when someone joins/leaves)
