@@ -10,7 +10,8 @@ import MapPicker from "@/components/MapPicker";
 import { ALL_LOCATIONS } from "@/constants/landmarks";
 import { calculateDistance, calculateRidePrice, formatPrice } from "@/utils/pricing";
 import { rideService } from "@/lib/database";
-import { VehicleType } from "@prisma/client";
+// Vehicle type enum for frontend
+type VehicleType = "car" | "bike";
 
 const OfferARide = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const OfferARide = () => {
 
   // Auto-set seats to 1 for bikes and calculate suggested price
   useEffect(() => {
-    if (vehicleType === "bike") {
+    if (vehicleType.toLowerCase() === "bike") {
       setSeats(1);
     }
     calculateSuggestedPrice();

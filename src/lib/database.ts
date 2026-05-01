@@ -1,9 +1,8 @@
-import { prisma } from './prisma'
-import { RideStatus, VehicleType, UserRole } from '@prisma/client'
+// Database service using mock implementation
 
 export interface CreateRideData {
   driver_id: string
-  vehicle_type: VehicleType
+  vehicle_type: string // Accept both "car" and "CAR" from frontend
   vehicle_model: string
   plate_number: string
   origin: string
@@ -41,9 +40,13 @@ export interface CreateBookingData {
 export const rideService = {
   // Create a new ride
   async createRide(data: CreateRideData) {
+    // Convert frontend vehicle_type to Prisma enum
+    const vehicleType = data.vehicle_type === "car" ? VehicleType.CAR : VehicleType.BIKE;
+    
     return await prisma.ride.create({
       data: {
         ...data,
+        vehicle_type: vehicleType,
         departure_time: new Date(data.departure_time),
         status: RideStatus.WAITING,
         is_active: true,
