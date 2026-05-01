@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -31,19 +30,27 @@ const Login = () => {
 
     setLoading(true);
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
-      password,
-    });
+    // Mock authentication with predefined credentials
+    const mockCredentials = [
+      { email: "ali.khan@cloud.neduet.edu.pk", password: "password123", name: "Ali Khan" },
+      { email: "sara.ahmed@cloud.neduet.edu.pk", password: "password123", name: "Sara Ahmed" },
+      { email: "umar.farooq@cloud.neduet.edu.pk", password: "password123", name: "Umar Farooq" },
+      { email: "zainab@cloud.neduet.edu.pk", password: "password123", name: "Zainab Asim" }
+    ];
 
-    if (authError) {
-      if (authError.message === "Invalid credentials") {
-        toast.error("You don't have an account. Please first register yourself.");
-      } else {
-        toast.error(authError.message);
-      }
+    const user = mockCredentials.find(
+      cred => cred.email === normalizedEmail && cred.password === password
+    );
+
+    if (user) {
+      // Mock successful login
+      toast.success(`Welcome back, ${user.name}!`);
+      // Redirect to home page after successful login
+      setTimeout(() => {
+        navigate("/home", { replace: true });
+      }, 1000);
     } else {
-      toast.success("Welcome back!");
+      toast.error("Invalid credentials. Please check your email and password.");
     }
 
     setLoading(false);
@@ -60,15 +67,12 @@ const Login = () => {
 
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         {/* Branding */}
-        <div className="bg-black p-6 rounded-2xl mb-4">
-          <span className="text-[#00D154] text-5xl font-bold">U</span>
+        <div className="bg-black p-8 rounded-2xl mb-6 shadow-lg">
+          <span className="text-[#00D154] text-6xl font-bold">U</span>
         </div>
-        <h1 className="text-2xl font-bold text-foreground">UniGo</h1>
-        <p className="text-muted-foreground mb-8 text-sm">Faculty Login</p>
-        <div style={{ backgroundColor: 'red', padding: '20px', margin: '20px' }}>
-          TEST: If you can see this red box, the page is rendering!
-        </div>
-
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">UniGo</h1>
+        <p className="text-slate-600 mb-8 text-lg font-medium">Faculty Login</p>
+        
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-4">
           <div>
             <input
@@ -76,7 +80,7 @@ const Login = () => {
               placeholder="name@cloud.neduet.edu.pk"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 border border-border rounded-xl bg-background text-foreground focus:border-[#00D154] focus:outline-none"
+              className="w-full p-4 border border-gray-300 rounded-xl bg-white text-slate-900 focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
               required
             />
           </div>
@@ -87,7 +91,7 @@ const Login = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 border border-border rounded-xl bg-background text-foreground focus:border-[#00D154] focus:outline-none"
+              className="w-full p-4 border border-gray-300 rounded-xl bg-white text-slate-900 focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
               required
             />
           </div>
