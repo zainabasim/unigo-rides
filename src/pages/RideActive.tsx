@@ -18,7 +18,28 @@ interface RidePartner {
 
 interface RideData {
   id: string;
-  driver: {
+  driver_id: string;
+  driver_name?: string;
+  driver_phone?: string;
+  origin: string;
+  destination: string;
+  area?: string;
+  departure_time: string;
+  price: number;
+  fuel_price?: number;
+  total_seats: number;
+  available_seats: number;
+  vehicle_model: string;
+  plate_number: string;
+  is_active: boolean;
+  ride_status: string;
+  created_at: string;
+  vehicle_type?: string;
+  // Computed properties
+  filled_seats?: number;
+  seats?: number;
+  // Additional properties for compatibility
+  driver?: {
     profile: {
       id: string;
       created_at: Date;
@@ -30,23 +51,7 @@ interface RideData {
       phone_number: string;
     };
   };
-  vehicle_type: string;
-  vehicle_model: string;
-  plate_number: string;
-  origin: string;
-  destination: string;
-  origin_lat?: number;
-  origin_lng?: number;
-  destination_lat?: number;
-  destination_lng?: number;
-  departure_time: Date;
-  status: string;
-  total_seats: number;
-  available_seats: number;
-  price: number;
-  is_active: boolean;
-  bookings: RidePartner[];
-  created_at: string;
+  bookings?: RidePartner[];
 }
 
 export default function RideActive() {
@@ -60,7 +65,28 @@ export default function RideActive() {
       try {
         setLoading(true);
         const rideData = await rideService.getRide(id);
-        setRide(rideData);
+        // Calculate missing properties for compatibility
+        const processedRide = {
+          ...rideData,
+          filled_seats: rideData.total_seats - rideData.available_seats,
+          seats: rideData.total_seats,
+          status: rideData.ride_status,
+          departure_time: new Date(rideData.departure_time),
+          driver: {
+            profile: {
+              id: rideData.driver_id,
+              created_at: new Date(),
+              updated_at: new Date(),
+              full_name: rideData.driver_name || 'Unknown Driver',
+              department: 'Computer Science',
+              avatar: '',
+              user_id: rideData.driver_id,
+              phone_number: rideData.driver_phone || ''
+            }
+          },
+          bookings: []
+        };
+        setRide(processedRide);
       } catch (error) {
         console.error('Error fetching ride:', error);
         toast.error('Failed to load ride details');
@@ -76,8 +102,8 @@ export default function RideActive() {
     if (!ride) return;
     
     try {
-      await rideService.updateRideStatus(ride.id, 'IN_PROGRESS');
-      setRide({ ...ride, status: 'IN_PROGRESS' });
+      await rideService.updateRideStatus(ride.id, 'in_progress');
+      setRide({ ...ride, status: 'in_progress' });
       toast.success('Ride started successfully!');
     } catch (error) {
       console.error('Error starting ride:', error);
@@ -89,8 +115,8 @@ export default function RideActive() {
     if (!ride) return;
     
     try {
-      await rideService.updateRideStatus(ride.id, 'CANCELLED');
-      setRide({ ...ride, status: 'CANCELLED' });
+      await rideService.updateRideStatus(ride.id, 'cancelled');
+      setRide({ ...ride, status: 'cancelled' });
       toast.success('Ride cancelled successfully!');
       setTimeout(() => navigate('/home'), 2000);
     } catch (error) {
@@ -110,22 +136,34 @@ export default function RideActive() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'WAITING': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'IN_PROGRESS': return 'text-green-600 bg-green-50 border-green-200';
-      case 'COMPLETED': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'CANCELLED': return 'text-red-600 bg-red-50 border-red-200';
-      case 'EXPIRED': return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'WAITING': 
+      case 'waiting':
+      case 'active': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'IN_PROGRESS': 
+      case 'in_progress': return 'text-green-600 bg-green-50 border-green-200';
+      case 'COMPLETED': 
+      case 'completed': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'CANCELLED': 
+      case 'cancelled': return 'text-red-600 bg-red-50 border-red-200';
+      case 'EXPIRED': 
+      case 'expired': return 'text-gray-600 bg-gray-50 border-gray-200';
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'WAITING': return 'Waiting for passengers';
-      case 'IN_PROGRESS': return 'Ride in progress';
-      case 'COMPLETED': return 'Completed';
-      case 'CANCELLED': return 'Cancelled';
-      case 'EXPIRED': return 'Expired';
+      case 'WAITING': 
+      case 'waiting':
+      case 'active': return 'Waiting for passengers';
+      case 'IN_PROGRESS': 
+      case 'in_progress': return 'Ride in progress';
+      case 'COMPLETED': 
+      case 'completed': return 'Completed';
+      case 'CANCELLED': 
+      case 'cancelled': return 'Cancelled';
+      case 'EXPIRED': 
+      case 'expired': return 'Expired';
       default: return 'Unknown';
     }
   };
@@ -155,10 +193,10 @@ export default function RideActive() {
     );
   }
 
-  const isExpired = ride.status === 'EXPIRED';
-  const isCancelled = ride.status === 'CANCELLED';
-  const isCompleted = ride.status === 'COMPLETED';
-  const canStart = ride.status === 'WAITING' && !isExpired;
+  const isExpired = ride.status === 'EXPIRED' || ride.status === 'expired';
+  const isCancelled = ride.status === 'CANCELLED' || ride.status === 'cancelled';
+  const isCompleted = ride.status === 'COMPLETED' || ride.status === 'completed';
+  const canStart = (ride.status === 'WAITING' || ride.status === 'waiting' || ride.status === 'active') && !isExpired;
 
   return (
     <div className="min-h-screen bg-slate-50 py-8">
@@ -221,7 +259,7 @@ export default function RideActive() {
               <div>
                 <p className="font-medium text-slate-900">{ride?.origin || 'N/A'} - {ride?.destination || 'N/A'}</p>
                 <p className="text-sm text-slate-600">
-                  {new Date(ride.departure_time).toLocaleDateString()} at {new Date(ride.departure_time).toLocaleTimeString()}
+                  {ride.departure_time}
                 </p>
               </div>
             </div>
