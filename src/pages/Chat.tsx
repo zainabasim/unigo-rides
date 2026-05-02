@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
@@ -13,13 +13,13 @@ const Chat = () => {
   const { data: ride, isLoading } = useQuery({
     queryKey: ["ride-chat", rideId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rides")
-        .select("*, profiles!rides_driver_id_fkey(full_name)")
-        .eq("id", rideId!)
-        .single();
-      if (error) throw error;
-      return data;
+      // Mock ride data for chat
+      return {
+        id: rideId,
+        origin: "NED University",
+        destination: "Gulshan",
+        driver_name: "Demo Driver",
+      };
     },
     enabled: !!rideId,
   });

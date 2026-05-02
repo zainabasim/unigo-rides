@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { rideService } from "@/lib/database";
 import { Car, Users, MapPin, Clock, Phone, MessageCircle, CheckCircle, XCircle } from "lucide-react";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
@@ -20,34 +20,18 @@ const DriverDashboard = () => {
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
-        .from("rides")
-        .select(`
-          *,
-          bookings (
-            id,
-            status,
-            passenger_id,
-            profiles!bookings_passenger_id_fkey(full_name, department, phone)
-          )
-        `)
-        .eq("driver_id", user.id)
-        .order("departure_time", { ascending: true });
-
-      if (error) throw error;
-      return data;
+      // Use mock service instead of Supabase
+      const data = await rideService.getDriverRides(user.id);
+      return data.map(ride => ({ ...ride, bookings: [] })); // Add empty bookings for now
     },
     enabled: !!user?.id,
   });
 
   const updateBookingStatus = useMutation({
     mutationFn: async ({ bookingId, status }: { bookingId: string; status: string }) => {
-      const { error } = await supabase
-        .from("bookings")
-        .update({ status })
-        .eq("id", bookingId);
-
-      if (error) throw error;
+      // Mock booking status update
+      console.log(`Updating booking ${bookingId} to status: ${status}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
       return bookingId;
     },
     onSuccess: () => {

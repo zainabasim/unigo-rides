@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { rideService } from "@/lib/database";
 import { ArrowLeft, Play, CheckCircle, Users, Clock } from "lucide-react";
 import nedLogo from "@/assets/ned-logo.png";
 
@@ -15,14 +16,9 @@ const ManageRide = () => {
   const { data: ride, isLoading: rideLoading } = useQuery({
     queryKey: ["manage-ride", rideId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rides")
-        .select("*")
-        .eq("id", rideId!)
-        .eq("driver_id", user!.id)
-        .single();
-      if (error) throw error;
-      return data;
+      // Use mock service instead of Supabase
+      const rides = await rideService.getDriverRides(user!.id);
+      return rides.find(r => r.id === rideId) || null;
     },
     enabled: !!rideId && !!user,
   });
@@ -30,38 +26,17 @@ const ManageRide = () => {
   const { data: passengers = [], isLoading: passengersLoading } = useQuery({
     queryKey: ["ride-passengers", rideId],
     queryFn: async () => {
-      const { data: bookings, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("ride_id", rideId!)
-        .eq("status", "booked");
-      if (error) throw error;
-      if (!bookings || bookings.length === 0) return [];
-      
-      // Fetch profiles for all passengers
-      const passengerIds = bookings.map(b => b.passenger_id);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, department")
-        .in("user_id", passengerIds);
-      
-      const profileMap = new Map((profiles || []).map(p => [p.user_id, p]));
-      return bookings.map(b => ({
-        ...b,
-        profiles: profileMap.get(b.passenger_id) || null,
-      }));
+      // Mock passengers data for now
+      return [];
     },
     enabled: !!rideId,
   });
 
   const startRideMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("rides")
-        .update({ ride_status: "in_progress" })
-        .eq("id", rideId!)
-        .eq("driver_id", user!.id);
-      if (error) throw error;
+      // Mock ride start
+      console.log(`Starting ride ${rideId}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["manage-ride", rideId] });
@@ -72,12 +47,9 @@ const ManageRide = () => {
 
   const completeRideMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("rides")
-        .update({ ride_status: "completed", is_active: false })
-        .eq("id", rideId!)
-        .eq("driver_id", user!.id);
-      if (error) throw error;
+      // Mock ride completion
+      console.log(`Completing ride ${rideId}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["manage-ride", rideId] });

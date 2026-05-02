@@ -468,14 +468,19 @@ let authStateChangeCallback: ((event: string, session: MockSession | null) => vo
 const onAuthStateChange = (callback: (event: string, session: MockSession | null) => void) => {
   authStateChangeCallback = callback;
   
-  // Check current session
-  getSession().then(({ data }) => {
-    if (data?.session) {
-      callback("SIGNED_IN", data.session);
+  // Check current session from localStorage
+  try {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      callback("SIGNED_IN", user);
     } else {
       callback("SIGNED_OUT", null);
     }
-  });
+  } catch (error) {
+    console.error('Error checking session:', error);
+    callback("SIGNED_OUT", null);
+  }
 
   return {
     data: {
