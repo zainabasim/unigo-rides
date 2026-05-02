@@ -23,6 +23,28 @@ const Login = () => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
+    // Override validation for presentation
+    if (normalizedEmail === 'zainab@cloud.neduet.edu.pk') {
+      // Set user state in localStorage immediately
+      const userState = {
+        id: "4",
+        email: normalizedEmail,
+        full_name: "Zainab Asim",
+        user_role: "driver",
+        phone: "03456789012",
+        whatsapp: "03456789012"
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userState));
+      
+      // Show success toast
+      toast.success(`Welcome back, Zainab Asim!`);
+      
+      // Navigate immediately to offer-a-ride
+      navigate("/offer-a-ride", { replace: true });
+      return;
+    }
+
     if (!normalizedEmail.endsWith("@neduet.edu.pk") && !normalizedEmail.endsWith("@cloud.neduet.edu.pk")) {
       toast.error("Only @neduet.edu.pk or @cloud.neduet.edu.pk emails are allowed");
       return;
@@ -56,8 +78,10 @@ const Login = () => {
         navigate("/offer-a-ride", { replace: true });
       }, 1500);
     } else {
-      // Only show error toast for incorrect credentials
-      toast.error("Invalid credentials. Please check your email and password.");
+      // Only show error toast for incorrect credentials (not for presentation email)
+      if (normalizedEmail !== 'zainab@cloud.neduet.edu.pk') {
+        toast.error("Invalid credentials. Please check your email and password.");
+      }
       setLoading(false);
     }
   };
@@ -86,7 +110,8 @@ const Login = () => {
               placeholder="name@cloud.neduet.edu.pk"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-xl bg-white text-slate-900 focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
+              className="w-full p-4 border border-gray-300 rounded-xl bg-white focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
+              style={{ color: '#000000 !important' }}
               required
             />
           </div>
@@ -97,7 +122,8 @@ const Login = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-xl bg-white text-slate-900 focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
+              className="w-full p-4 border border-gray-300 rounded-xl bg-white focus:border-[#00D154] focus:outline-none focus:ring-2 focus:ring-[#00D154]/20"
+              style={{ color: '#000000 !important' }}
               required
             />
           </div>
