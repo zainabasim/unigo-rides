@@ -40,72 +40,71 @@ export interface CreateBookingData {
 export const rideService = {
   // Create a new ride
   async createRide(data: CreateRideData) {
-    // Convert frontend vehicle_type to Prisma enum
-    const vehicleType = data.vehicle_type === "car" ? VehicleType.CAR : VehicleType.BIKE;
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
     
-    return await prisma.ride.create({
-      data: {
-        ...data,
-        vehicle_type: vehicleType,
-        departure_time: new Date(data.departure_time),
-        status: RideStatus.WAITING,
+    try {
+      const rideData = {
+        driver_id: data.driver_id,
+        vehicle_type: data.vehicle_type,
+        vehicle_model: data.vehicle_model,
+        plate_number: data.plate_number,
+        origin: data.origin,
+        destination: data.destination,
+        origin_lat: data.origin_lat,
+        origin_lng: data.origin_lng,
+        destination_lat: data.destination_lat,
+        destination_lng: data.destination_lng,
+        departure_time: data.departure_time.toISOString(),
+        total_seats: data.total_seats,
+        available_seats: data.available_seats,
+        price: data.price,
         is_active: true,
-      },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
+        ride_status: 'active',
+        created_at: new Date().toISOString()
+      };
+
+      const result = await mockSupabase
+        .from('rides')
+        .insert(rideData);
+      
+      const { data: insertedData, error } = result;
+      
+      if (error || !insertedData) {
+        throw new Error(error?.message || 'Failed to create ride');
       }
-    })
+      
+      return insertedData;
+    } catch (error) {
+      console.error('Error creating ride:', error);
+      throw error;
+    }
   },
 
   // Get all available rides (for passengers to see)
   async getAvailableRides() {
-    const currentTime = new Date()
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
     
-    return await prisma.ride.findMany({
-      where: {
-        is_active: true,
-        status: RideStatus.WAITING,
-        available_seats: {
-          gt: 0
-        },
-        // Filter out expired rides (15 minutes past departure time)
-        departure_time: {
-          gt: new Date(currentTime.getTime() - 15 * 60 * 1000)
-        }
-      },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        departure_time: 'asc'
+    try {
+      const result = await mockSupabase
+        .from('rides')
+        .select('*')
+        .eq('is_active', true)
+        .eq('ride_status', 'active')
+        .order('created_at', { ascending: true });
+      
+      const { data, error } = result;
+      
+      if (error) {
+        throw new Error(error?.message || 'Failed to fetch available rides');
       }
-    })
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching available rides:', error);
+      throw error;
+    }
   },
 
   // Get ride by ID
@@ -160,9 +159,7 @@ export const rideService = {
       const result = await mockSupabase
         .from('rides')
         .update(updateData)
-        .eq('id', rideId)
-        .select('*')
-        .single();
+        .eq('id', rideId);
       
       const { data, error } = result;
       
@@ -179,128 +176,179 @@ export const rideService = {
 
   // Update available seats (when someone joins/leaves)
   async updateAvailableSeats(rideId: string, seatsChange: number) {
-    return await prisma.ride.update({
-      where: { id: rideId },
-      data: {
-        available_seats: {
-          increment: seatsChange
-        }
-      },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      // First get current ride data
+      const getResult = await mockSupabase
+        .from('rides')
+        .select('available_seats')
+        .eq('id', rideId)
+        .single();
+      
+      if (getResult.error) {
+        throw new Error(getResult.error.message);
       }
-    })
+      
+      const currentSeats = getResult.data.available_seats;
+      const newSeats = Math.max(0, currentSeats + seatsChange);
+      
+      // Update with new seat count
+      const result = await mockSupabase
+        .from('rides')
+        .update({ available_seats: newSeats })
+        .eq('id', rideId);
+      
+      const { data, error } = result;
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Failed to update available seats');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error updating available seats:', error);
+      throw error;
+    }
   },
 
   // Get rides for a specific driver
   async getDriverRides(driverId: string) {
-    return await prisma.ride.findMany({
-      where: { driver_id: driverId },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        created_at: 'desc'
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const result = await mockSupabase
+        .from('rides')
+        .select('*')
+        .eq('driver_id', driverId)
+        .order('created_at', { ascending: false });
+      
+      const { data, error } = result;
+      
+      if (error) {
+        throw new Error(error?.message || 'Failed to fetch driver rides');
       }
-    })
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching driver rides:', error);
+      throw error;
+    }
   },
 
   // Cancel ride
   async cancelRide(rideId: string) {
-    return await prisma.ride.update({
-      where: { id: rideId },
-      data: {
-        status: RideStatus.CANCELLED,
-        is_active: false
-      },
-      include: {
-        driver: {
-          include: {
-            profile: true
-          }
-        },
-        bookings: {
-          include: {
-            passenger: {
-              include: {
-                profile: true
-              }
-            }
-          }
-        }
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const result = await mockSupabase
+        .from('rides')
+        .update({ 
+          ride_status: 'cancelled',
+          is_active: false 
+        })
+        .eq('id', rideId);
+      
+      const { data, error } = result;
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Failed to cancel ride');
       }
-    })
-  }
+      
+      return data;
+    } catch (error) {
+      console.error('Error cancelling ride:', error);
+      throw error;
+    }
+  },
 }
 
 // User operations
 export const userService = {
   // Create user
   async createUser(data: CreateUserData) {
-    const user = await prisma.user.create({
-      data: {
-        ...data,
-        user_role: data.user_role || UserRole.DRIVER
-      }
-    })
-
-    // Create profile
-    await prisma.profile.create({
-      data: {
-        user_id: user.id,
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const userData = {
+        email: data.email,
         full_name: data.full_name,
-        department: data.department,
-        phone_number: data.phone,
-      }
-    })
+        phone: data.phone,
+        whatsapp: data.whatsapp,
+        password: data.password,
+        user_role: data.user_role || "driver",
+        created_at: new Date().toISOString()
+      };
 
-    return user
+      const result = await mockSupabase
+        .from('users')
+        .insert(userData);
+      
+      const { data: insertedUser, error } = result;
+      
+      if (error || !insertedUser) {
+        throw new Error(error?.message || 'Failed to create user');
+      }
+      
+      return insertedUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   },
 
   // Get user by email
   async getUserByEmail(email: string) {
-    return await prisma.user.findUnique({
-      where: { email },
-      include: {
-        profile: true
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const result = await mockSupabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      const { data, error } = result;
+      
+      if (error) {
+        throw new Error(error?.message || 'Failed to fetch user by email');
       }
-    })
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching user by email:', error);
+      throw error;
+    }
   },
 
   // Get user by ID
   async getUserById(userId: string) {
-    return await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        profile: true
+    // Use mock service instead of Prisma
+    const { mockSupabase } = await import('../mock/mockService');
+    
+    try {
+      const result = await mockSupabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      const { data, error } = result;
+      
+      if (error) {
+        throw new Error(error?.message || 'Failed to fetch user by ID');
       }
-    })
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching user by ID:', error);
+      throw error;
+    }
   }
 }
 
