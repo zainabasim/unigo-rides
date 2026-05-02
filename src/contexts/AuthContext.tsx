@@ -1,10 +1,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+
+interface MockUser {
+  id: string;
+  email: string;
+  full_name: string;
+  user_role: string;
+  phone: string;
+  whatsapp: string;
+}
 
 interface AuthContextType {
-  session: Session | null;
-  user: User | null;
+  session: MockUser | null;
+  user: MockUser | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -12,65 +19,50 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
-  loading: true,
+  loading: false,
   signOut: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-const ensureProfile = async (user: User) => {
-  const fullName = typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "";
-  const phone = typeof user.user_metadata?.phone === "string" ? user.user_metadata.phone : "";
-
-  if (!fullName && !phone) return;
-
-  await supabase.from("profiles").upsert(
-    {
-      user_id: user.id,
-      full_name: fullName,
-    },
-    { onConflict: "user_id" }
-  );
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<MockUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up auth state change listener');
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        console.log('AuthProvider: Auth state changed', { event: _event, hasSession: !!session });
-        setSession(session);
-        if (session?.user) {
-          void ensureProfile(session.user);
-        }
-        setLoading(false);
+    console.log('AuthProvider: Checking localStorage for user session');
+    
+    // Check localStorage for existing user session
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        console.log('AuthProvider: Found user in localStorage', { email: user.email });
+        setSession(user);
+      } catch (error) {
+        console.error('AuthProvider: Error parsing stored user', error);
+        localStorage.removeItem('user');
       }
-    );
-
-    console.log('AuthProvider: Getting current session');
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('AuthProvider: Got current session', { hasSession: !!session });
-      setSession(session);
-      if (session?.user) {
-        void ensureProfile(session.user);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    
+    setLoading(false);
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    // Session will be automatically cleared by Supabase
+    console.log('AuthProvider: Signing out user');
+    
+    // Clear session state
+    setSession(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('user');
+    
+    console.log('AuthProvider: User signed out successfully');
     // Navigation will redirect to login page via useEffect in components
   };
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, signOut }}>
+    <AuthContext.Provider value={{ session, user: session, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
