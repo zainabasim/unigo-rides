@@ -117,68 +117,68 @@ const OfferARide = () => {
 
     setLoading(true);
     
-    const rideData = {
-      driver_id: user?.id,
-      vehicle_type: vehicleType,
-      vehicle_model: vehicleModel,
-      plate_number: plateNumber,
-      origin: pickupLocation,
-      destination: destination,
-      origin_lat: pickupCoords?.lat,
-      origin_lng: pickupCoords?.lng,
-      destination_lat: destinationCoords?.lat,
-      destination_lng: destinationCoords?.lng,
-      departure_time: new Date(convertTimeToISODate(departureTime)),
-      total_seats: seats,
-      available_seats: seats,
-      price: parseFloat(price) || 0,
-      is_recurring: isRecurring,
-      recurring_days: recurringDays,
-      recurring_time: departureTime,
-    };
+    // Use setTimeout to prevent blocking UI
+    setTimeout(async () => {
+      try {
+        const rideData = {
+          driver_id: user?.id,
+          vehicle_type: vehicleType,
+          vehicle_model: vehicleModel,
+          plate_number: plateNumber,
+          origin: pickupLocation,
+          destination: destination,
+          origin_lat: pickupCoords?.lat,
+          origin_lng: pickupCoords?.lng,
+          destination_lat: destinationCoords?.lat,
+          destination_lng: destinationCoords?.lng,
+          departure_time: new Date(convertTimeToISODate(departureTime)),
+          total_seats: seats,
+          available_seats: seats,
+          price: parseFloat(price) || 0,
+          is_recurring: isRecurring,
+          recurring_days: recurringDays,
+          recurring_time: departureTime,
+        };
 
-    try {
-      // Generate proper ride ID
-      const rideId = `UG-${Math.floor(Math.random() * 10000)}`;
-      const tempRideData = {
-        ...rideData,
-        id: rideId,
-        created_at: new Date().toISOString()
-      };
-      
-      // Use setTimeout to avoid blocking the main thread
-      setTimeout(() => {
+        // Generate proper ride ID
+        const rideId = `UG-${Math.floor(Math.random() * 10000)}`;
+        const tempRideData = {
+          ...rideData,
+          id: rideId,
+          created_at: new Date().toISOString()
+        };
+        
+        // Save to localStorage first for immediate response
         localStorage.setItem('activeRide', JSON.stringify(tempRideData));
-      }, 0);
-      
-      // Redirect immediately to active ride page
-      navigate(`/ride-active/${rideId}`);
-      
-      // Then save to database in background
-      rideService.createRide(rideData)
-        .then(data => {
-          // Update localStorage with real ride ID
-          localStorage.setItem('activeRide', JSON.stringify({
-            ...tempRideData,
-            id: data.id
-          }));
-          
-          // Update the URL to use real ride ID
-          window.history.replaceState(null, '', `/ride-active/${data.id}`);
-        })
-        .catch(error => {
-          console.error('Database error:', error);
-          toast.error("Failed to save ride to database: " + (error as Error).message);
-          // Keep the ride in localStorage with temp ID for now
-        });
-      
-      setLoading(false);
-      toast.success("Ride offered successfully!");
-      
-    } catch (error) {
-      setLoading(false);
-      toast.error("Failed to offer ride: " + (error as Error).message);
-    }
+        
+        // Redirect immediately to active ride page
+        navigate(`/ride-active/${rideId}`);
+        
+        // Then save to database in background
+        rideService.createRide(rideData)
+          .then(data => {
+            // Update localStorage with real ride ID
+            localStorage.setItem('activeRide', JSON.stringify({
+              ...tempRideData,
+              id: data.id
+            }));
+            
+            // Update the URL to use real ride ID
+            window.history.replaceState(null, '', `/ride-active/${data.id}`);
+          })
+          .catch(error => {
+            console.error('Database error:', error);
+            toast.error("Failed to save ride to database: " + (error as Error).message);
+          });
+        
+        setLoading(false);
+        toast.success("Ride offered successfully!");
+        
+      } catch (error) {
+        setLoading(false);
+        toast.error("Failed to offer ride: " + (error as Error).message);
+      }
+    }, 0);
   };
 
 
