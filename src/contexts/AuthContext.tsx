@@ -30,34 +30,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider: Checking localStorage for user session');
+    let timeoutId: NodeJS.Timeout;
     
-    // Check localStorage for existing user session
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    // Set a 2-second timeout to force success state
+    timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    
+    // Check localStorage for existing user session (async)
+    setTimeout(() => {
       try {
-        const user = JSON.parse(storedUser);
-        console.log('AuthProvider: Found user in localStorage', { email: user.email });
-        setSession(user);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          setSession(user);
+        }
+        setLoading(false);
+        clearTimeout(timeoutId);
       } catch (error) {
-        console.error('AuthProvider: Error parsing stored user', error);
         localStorage.removeItem('user');
+        setLoading(false);
+        clearTimeout(timeoutId);
       }
-    }
+    }, 0);
     
-    setLoading(false);
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   const signOut = async () => {
-    console.log('AuthProvider: Signing out user');
-    
     // Clear session state
     setSession(null);
     
-    // Clear localStorage
-    localStorage.removeItem('user');
+    // Clear localStorage asynchronously
+    setTimeout(() => {
+      localStorage.removeItem('user');
+    }, 0);
     
-    console.log('AuthProvider: User signed out successfully');
     // Navigation will redirect to login page via useEffect in components
   };
 

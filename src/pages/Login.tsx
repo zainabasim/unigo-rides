@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import unigoIcon from "@/assets/unigo-icon.png";
 import nedLogo from "@/assets/ned-logo.png";
 
-const Login = () => {
-  console.log('Login.tsx: Rendering Login component');
+const Login = memo(() => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -155,6 +153,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Login;

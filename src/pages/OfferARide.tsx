@@ -46,6 +46,30 @@ const OfferARide = () => {
     calculateSuggestedPrice();
   }, [vehicleType, pickupCoords, destinationCoords]);
 
+  // Helper function to convert time string to valid ISO date
+  const convertTimeToISODate = (timeString: string): string => {
+    if (!timeString) return new Date().toISOString();
+    
+    // Check if it's already a valid date string
+    const parsedDate = new Date(timeString);
+    if (!isNaN(parsedDate.getTime())) {
+      return parsedDate.toISOString();
+    }
+    
+    // If it's just a time string like "9:30", attach it to current date
+    const today = new Date();
+    const [hours, minutes] = timeString.split(':').map(Number);
+    
+    if (!isNaN(hours) && !isNaN(minutes)) {
+      const dateWithTime = new Date(today);
+      dateWithTime.setHours(hours, minutes, 0, 0);
+      return dateWithTime.toISOString();
+    }
+    
+    // Fallback to current time
+    return new Date().toISOString();
+  };
+
   // Swap pickup and destination
   const swapLocations = () => {
     const tempLocation = pickupLocation;
@@ -104,7 +128,7 @@ const OfferARide = () => {
       origin_lng: pickupCoords?.lng,
       destination_lat: destinationCoords?.lat,
       destination_lng: destinationCoords?.lng,
-      departure_time: new Date(departureTime),
+      departure_time: new Date(convertTimeToISODate(departureTime)),
       total_seats: seats,
       available_seats: seats,
       price: parseFloat(price) || 0,
@@ -114,18 +138,21 @@ const OfferARide = () => {
     };
 
     try {
-      // Save to localStorage first for immediate response
-      const tempRideId = `temp_${Date.now()}`;
+      // Generate proper ride ID
+      const rideId = `UG-${Math.floor(Math.random() * 10000)}`;
       const tempRideData = {
         ...rideData,
-        id: tempRideId,
+        id: rideId,
         created_at: new Date().toISOString()
       };
       
-      localStorage.setItem('activeRide', JSON.stringify(tempRideData));
+      // Use setTimeout to avoid blocking the main thread
+      setTimeout(() => {
+        localStorage.setItem('activeRide', JSON.stringify(tempRideData));
+      }, 0);
       
       // Redirect immediately to active ride page
-      navigate(`/ride-active/${tempRideId}`);
+      navigate(`/ride-active/${rideId}`);
       
       // Then save to database in background
       rideService.createRide(rideData)
