@@ -328,7 +328,7 @@ export default function RideActive() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">{ride?.filled_seats || 0}/{ride?.total_seats || 0} seats filled</span>
             <span className="text-lg font-semibold text-green-600">
-              ${ride.price}
+              PKR {ride.price}
             </span>
           </div>
         </div>
